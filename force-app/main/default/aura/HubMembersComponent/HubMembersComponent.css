@@ -1,0 +1,56 @@
+.THIS .button_link:hover{
+    text-decoration:underline;
+}
+
+.THIS .slds-size_2-of-12{
+    width: 3%;
+}
+
+.THIS .slds-size_1-of-12{
+    width: 14%;
+}
+
+.THIS .slds-size_3-of-12{
+    width: 30%;
+}
+
+.THIS .slds-size_4-of-12{
+    width: 5%;
+}
+
+.THIS .slds-size_5-of-12{
+    width: 1%;
+}
+
+.THIS .isActivityLoadingRight .slds-spinner_container {
+    position: relative !important;
+    float: right;
+ }
+
+ .THIS .isActivityLoading .slds-spinner_container {
+    position: relative !important;
+ }
+
+ .THIS .progressCol {
+    margin-top: 0.65rem !important;
+ }
+
+ .THIS .slds-dropdown__item > a{
+     color: var(--lwc-brandTextLink,rgb(0, 109, 204))
+ }
+
+ .THIS .slds-dropdown__item > a:hover .slds-dropdown__item > a::selection{
+    background-color: white;
+    color: var(--lwc-brandTextLinkActive,rgb(0, 95, 178));
+}
+
+.THIS .slds-button_icon-small {
+    font: initial !important;
+}
+
+.THIS div.refreshing {
+    position: fixed;
+    width:100%;
+    display: block;
+    z-index:99999999; 
+}

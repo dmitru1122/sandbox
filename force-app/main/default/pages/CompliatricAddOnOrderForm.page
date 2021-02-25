@@ -1,0 +1,268 @@
+<apex:page sidebar="false" applyHtmlTag="false" standardStylesheets="false" docType="html-5.0" showHeader="false" apiVersion="35.0" standardController="Opportunity" extensions="CompliatricOrderFormExtension" >
+<apex:form >
+<center><apex:commandButton action="{!saveAddOnPDF}" value="Save as PDF" /></center>
+</apex:form>
+<header>
+<apex:styleSheet value="https://fonts.googleapis.com/css?family=Lato|Source+Sans+Pro" />
+<apex:styleSheet value="{!URLFOR($Resource.CompliatricOrderStylesheet)}"/>
+
+</header>
+
+
+<body style="font: 13px Arial Unicode MS, sans-serif; margin: 25px;">
+<div style="background-repeat: no-repeat; min-height: 75px;"><apex:image url="{!URLFOR($Resource.Compliatric_Logo_OrderForm)}" /></div>
+
+<hr style="width: 98%; background-color: #dc6226; color: #dc6226; border-color: #dc6226; border: 0; border-top: 1px solid #dc6226;  height: 0px;"/>
+<p style="font-size: 18px; color: #ff7302; width: 100%; margin: 0 auto; text-align: center;">PURCHASE ORDER</p>
+<hr style="width: 98%; background-color: #dc6226; color: #dc6226; border-color: #dc6226; border: 0; border-top: 1px solid #dc6226;  height: 0px;"/>
+
+<p>This agreement is for {!Opportunity.Account.Name} (Client) and Compliatric, dated <apex:outputText value="{0,date, MMMM' 'dd,' 'yyyy}">
+    <apex:param value="{!TODAY()}" /> 
+</apex:outputText>.</p>
+
+<p class="subsection-header" style="font-size: 16px; font-weight: bold; text-decoration: underline;">Company Information:</p>
+
+
+<table width="100%">
+    <tr>
+        <td><span style="font-weight: bolder;">Company Name:</span> {!Opportunity.Account.Name}</td>
+        <td><span style="font-weight: bolder;">Customer Billing:</span> </td>
+    </tr>
+    <tr>
+        <td><span style="font-weight: bolder;">Billing Contact Name:</span>{!Opportunity.Billing_Contact__r.Name}</td>
+        <td>{!Opportunity.Account.Name}</td>
+    </tr>
+    <tr>
+        <td><span style="font-weight: bolder;">Email:</span> <span style="font-weight:normal;">{!Opportunity.Billing_Contact__r.Email}</span></td>
+        <td>{!Opportunity.Account.BillingStreet}</td>
+    </tr>
+    <tr>
+        <td><span style="font-weight: bolder;">Telephone:</span> <span style="font-weight:normal;">{!Opportunity.Billing_Contact__r.Phone}</span></td>
+        <td>{!Opportunity.Account.BillingCity}, {!Opportunity.Account.BillingState} {!Opportunity.Account.BillingPostalCode}</td>
+    </tr>
+</table>
+
+<p class="subsection-header">Service Description</p>
+<p>{!Opportunity.Account.Name} has requested the additional licenses and/or services described below:</p>
+
+<hr/>
+
+<p class="subsection-header">Terms &amp; Billing</p>
+<p> 
+Licenses will be billed effective the calendar month in which they are provisioned and will remain in effect for the client’s contract term.<br/><br/>
+
+Additional services will be billed the calendar month in which they are completed.</p>
+<!--<table width="100%">
+    <tr>
+        <th>Effective Date: <apex:outputText style="font-weight:normal;" value="{0,date, MMMM' 'dd,' 'yyyy}"><apex:param value="{!Opportunity.Effective_Order_Form_Date__c}" /></apex:outputText></th>
+        <th>Payment Method: <span style="font-weight:normal;">{!Opportunity.Payment_Method__c}</span></th>
+    </tr>
+    <tr>
+        <th>Initial Term End Date: <apex:outputText style="font-weight:normal;" value="{0,date, MMMM' 'dd,' 'yyyy}"><apex:param value="{!Opportunity.Initial_Term_End_Date__c}" /></apex:outputText></th>
+        <th>Payment Terms: <span style="font-weight:normal;">{!Opportunity.Payment_Terms__c}</span></th>
+    </tr>
+    <tr>
+        <th>Billing Method: <span style="font-weight:normal;">{!Opportunity.Billing_Method__c}</span></th>
+        <th>Billing Period / Frequency: <span style="font-weight:normal;">{!Opportunity.Billing_Period_Frequency__c}</span></th>
+    </tr>
+    <tr style="{!IF(Opportunity.PO_Required__c == false,'display: none;','')}">
+        <th>PO Required: <span style="font-weight:normal;">{!Opportunity.PO_Required__c}</span></th>
+        <th>PO Number: <span style="font-weight:normal;">{!Opportunity.pymt__PO_Number__c}</span></th>
+    </tr>
+</table>-->
+<br />
+<hr/>
+
+<p class="subsection-header">Payment Terms:</p>
+<p> 
+Client authorizes Compliatric to add additional license costs to their monthly subscription, due on the same date each period and to coincide with the effective date of the original agreement.
+<br/><br/>
+If client has paid for annual license subscription, additional license costs will be prorated for the remainder of the agreement term and charged to the client.
+<br/><br/>
+Requested services will be charged to the client’s payment information on file, unless other arrangements have been made in advance.
+</p>
+<!--<ul>
+    <li>Subscription fee payments are due on the same date each period and coincide with the effective date of the agreement.</li>
+    <li>Monthly subscription fees are paid via ACH or Credit Card draw.</li>
+    <li>Invoice for additional services have Net 15 terms.</li>
+    <li>We require receipt of the initial payment prior to provisioning the application and allocating professional service resources.</li>
+</ul>-->
+
+<div style="display: none;">
+<apex:outputField value="{!Opportunity.Name}"  style="display: none;" />
+</div>
+<div style="page-break-after:always;"> </div>
+
+<!-- PAGE 2 SCHEDULE DETAILS ***************** -->
+<div class="banner"><apex:image url="{!URLFOR($Resource.Compliatric_Logo_OrderForm)}" /></div>
+<hr />
+<p class="section-header">PURCHASE ORDER SCHEDULE</p>
+<hr />
+<br/>
+
+
+<table class="product-table" style="width: 100%; border: solid 1px #dc6226; border-collapse: collapse; border-spacing: 0; page-break-inside: avoid; page-break-before: auto;">
+<tr style="background-color: #dc6226; text-align: center; padding: 5px; page-break-inside: avoid; page-break-before: auto;">
+    <th style="border: solid 1px #dc6226; border-collapse: collapse; border-spacing: 0;padding: 5px; page-break-inside: avoid; page-break-before: auto; color: white;">
+        Service
+    </th>
+    <th style="border: solid 1px #dc6226; border-collapse: collapse; border-spacing: 0;padding: 5px; page-break-inside: avoid; page-break-before: auto; color: white;">
+        Description
+    </th>
+    <th style="border: solid 1px #dc6226; border-collapse: collapse; border-spacing: 0;padding: 5px; page-break-inside: avoid; page-break-before: auto; color: white; text-align: right;">
+        Qty
+    </th>
+    <th style="border: solid 1px #dc6226; border-collapse: collapse; border-spacing: 0;padding: 5px; page-break-inside: avoid; page-break-before: auto; color: white; text-align: right;">
+        $
+    </th>
+    <th style="border: solid 1px #dc6226; border-collapse: collapse; border-spacing: 0;padding: 5px; page-break-inside: avoid; page-break-before: auto; color: white; text-align: right;">
+        Monthly Recurring $
+    </th>
+</tr>
+    <apex:repeat value="{!LineItems}" var="c">
+    <tr>
+        <td width="25%" style="color: #ff7302; font-size: 14px; border: 1px #dc6226; font-weight: bold;"><apex:outputText value="{!Substitute(c.Name,c.Opportunity.Name,"")}" /></td>
+        <td width="45%" style="border: 1px #dc6226; border-collapse: collapse; border-spacing: 0;"><apex:outputField value="{!c.Product2.Invoice_Description__c}" /></td>
+        <td width="10%" style="border: 1px #dc6226; border-collapse: collapse; border-spacing: 0; text-align: right;" ><apex:outputField value="{!c.Invoice_Quantity__c}" /></td>
+        <td width="10%" style="border: 1px #dc6226; border-collapse: collapse; border-spacing: 0; text-align: right;" ><apex:outputField value="{!c.UnitPrice}" /></td>
+        <td width="10%" style="border: 1px #dc6226; border-collapse: collapse; border-spacing: 0; text-align: right;" ><apex:outputField value="{!c.Recurring_Costs__c}" /></td>
+    </tr>    
+    </apex:repeat>
+    <tr>
+        <td style="background-color: #787878; width: 100%;" colspan="5">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="3" style="text-align: right; font-weight: bold;">Total Monthly Recurring Costs</td>
+        <td>&nbsp;</td>
+        <td style="text-align: right; font-weight: bold;"><apex:outputField value="{!Opportunity.Total_Monthly_Recurring_Costs__c}" /></td>
+    </tr>
+</table>
+
+<hr style="width: 98%; background-color: #dc6226; color: #dc6226; border-color: #dc6226; border: 0; border-top: 1px solid #dc6226;  height: 0px;"/>
+<p><b>Recurring Monthly Payment Terms:&nbsp; <apex:outputField value="{!Opportunity.Total_Monthly_Recurring_Costs__c}" /></b></p>
+
+
+<!-- old table
+<table class="tableClass" >
+<tr class="table-header">
+    <td>
+        Service
+    </td>
+    <td>
+        Description
+    </td>
+    <td>
+        Qty
+    </td>
+    <td>
+        $
+    </td>
+    <td>
+        Monthly Recurring $
+    </td>
+</tr>
+    <apex:repeat value="{!LineItems}" var="c">
+    <tr>
+        <td width="25%" class="table-cell table-column-service"><apex:outputText value="{!Substitute(c.Name,c.Opportunity.Name,"")}" /></td>
+        <td width="45%" class="table-cell"><apex:outputField value="{!c.Product2.Invoice_Description__c}" /></td>
+        <td width="10%" class="table-cell table-cell-center"><apex:outputField value="{!c.Invoice_Quantity__c}" /></td>
+        <td width="10%" class="table-cell table-cell-center"><apex:outputField value="{!c.UnitPrice}" /></td>
+        <td width="10%" class="table-cell table-cell-right"><apex:outputField value="{!c.Recurring_Costs__c}" /></td>
+    </tr>    
+    </apex:repeat>
+    <tr class="table-footer">
+        <td colspan="3" class="table-cell-right">Total Monthly Recurring Costs</td>
+        <td>&nbsp;</td>
+        <td class="table-cell-right"><apex:outputField value="{!Opportunity.Total_Monthly_Recurring_Costs__c}" /></td>
+    </tr>
+</table>-->
+
+<!--<hr/>-->
+<!--<p><b>Total due at order signing to get started:&nbsp; <apex:outputField value="{!Opportunity.Setup_Fee__c}" /> + &nbsp;<apex:outputField value="{!Opportunity.Total_Monthly_Recurring_Costs__c}" /> (1st Month) =&nbsp; <apex:outputField value="{!Opportunity.Total_Order_Form_Price__c}" /></b></p>-->
+<!--<p><b>Recurring Monthly Payment Terms Difference:&nbsp; <apex:outputField value="{!Opportunity.Total_Monthly_Recurring_Costs__c}" /></b></p>
+-->
+<p style="font: 13px DialogInput, sans-serif;">BY EXECUTING THIS ORDER FORM, YOU AGREE TO OUR MSA AVAILABLE ONLINE AT THE FOLLOWING URL <a href="http://www.compliatric.com/agreements/JidokaMSA.pdf">http://www.compliatric.com/agreements/JidokaMSA.pdf</a>. IF YOU ARE ENTERING INTO THIS AGREEMENT ON BEHALF OF A COMPANY OR OTHER LEGAL ENTITY, YOU REPRESENT THAT YOU HAVE THE AUTHORITY TO BIND SUCH ENTITY AND ITS AFFILIATES TO THESE TERMS AND CONDITIONS, IN WHICH CASE THE TERMS "YOU" OR "YOUR" SHALL REFER TO SUCH ENTITY AND ITS AFFILIATES. IF YOU DO NOT HAVE SUCH AUTHORITY, OR IF YOU DO NOT AGREE WITH THESE TERMS AND CONDITIONS, YOU MUST NOT ACCEPT THIS AGREEMENT AND MAY NOT USE THE SERVICES.</p>
+
+<apex:outputText value="{!Opportunity.Order_Form_Custom_Text__c}" rendered="{!IF(ISBLANK(Opportunity.Order_Form_Custom_Text__c),false,true)}" escape="false"></apex:outputText>
+
+<hr/>
+<center><p><i>Remainder of this page intentionally left blank</i></p></center>
+
+<div style="page-break-after:always;"> </div>
+
+<!-- PAGE 3 ESIG DETAILS ***************** -->
+<div class="banner"><apex:image url="{!URLFOR($Resource.Compliatric_Logo_OrderForm)}" /></div>
+
+<table width="100%">
+    <tr>
+        <!--<th>Compliatric Signature</th>-->
+        <th>Client Signature</th>
+    </tr>
+    <tr>
+        <th colspan="2">&nbsp;</th>
+    </tr>
+    <tr>
+        <!--<td style="width: 50%"><apex:outputText value="[dvSignature_2]" styleClass="small-font"></apex:outputText><hr style="width: 100%;" /><b>Signature</b></td>-->
+        <td style="width: 50%"><apex:outputText value="[dvSignature_1]" styleClass="small-font"></apex:outputText><hr style="width: 100%;"/><b>Signature</b></td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <!--<td><apex:outputText value="[dvName_2]" styleClass="small-font"></apex:outputText><hr style="width: 100%;"/><b>Print Name</b></td>-->
+        <td><apex:outputText value="[dvName_1]" styleClass="small-font"></apex:outputText><hr style="width: 100%;"/><b>Print Name</b></td>
+    </tr>
+    <tr>
+        <th colspan="2">&nbsp;</th>
+    </tr>
+    <tr>
+        <!--<td><apex:outputText value="[dvTitle_2]" styleClass="small-font"></apex:outputText><hr style="width: 100%;"/><b>Title</b></td>-->
+        <td><apex:outputText value="[dvTitle_1]" styleClass="small-font"></apex:outputText><hr style="width: 100%;"/><b>Title</b></td>
+    </tr>
+    <tr>
+        <th colspan="2">&nbsp;</th>
+    </tr>
+    <tr>
+        <!--<td><apex:outputText value="[dvDate_2]" styleClass="small-font"></apex:outputText><hr style="width: 100%;"/><b>Date</b></td>-->
+        <td><apex:outputText value="[dvDate_1]" styleClass="small-font"></apex:outputText><hr style="width: 100%;"/><b>Date</b></td>
+    </tr>
+</table>
+
+</body>
+<div style="display: none;">
+{!Opportunity.PO_Required__c}
+{!Opportunity.Payment_Terms_Description__c}
+{!Opportunity.Effective_Order_Form_Date__c}
+{!Opportunity.Payment_Method__c}
+{!Opportunity.Initial_Term_End_Date__c}
+{!Opportunity.Payment_Terms__c }
+{!Opportunity.Billing_Method__c}
+{!Opportunity.Billing_Period_Frequency__c}
+{!Opportunity.Setup_Fee__c}
+{!Opportunity.Total_Order_Form_Price__c}
+</div>
+
+</apex:page>
+
+
+<!--
+Service Description
+[Client Name] has requested the additional licenses and/or services described below:
+
+Terms & Billing
+
+Licenses will be billed effective the calendar month in which they are provisioned and will remain in effect for the client’s contract term.
+
+Additional services will be billed the calendar month in which they are completed.
+
+Payment Terms
+
+Client authorizes Compliatric to add additional license costs to their monthly subscription, due on the same date each period and to coincide with the effective date of the original agreement.
+
+If client has paid for annual license subscription, additional license costs will be prorated for the remainder of the agreement term and charged to the client.
+
+Requested services will be charged to the client’s payment information on file, unless other arrangements have been made in advance.
+
+Purchase order schedule to remain the same - select from Products
+Purchase order verbiage to remain the same-->

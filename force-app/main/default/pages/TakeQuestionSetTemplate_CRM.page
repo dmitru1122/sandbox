@@ -1,0 +1,54 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" applyHtmlTag="false" docType="html-5.0" cache="false" contentType="text/html">
+    <html>
+        <head>
+            <meta charset="utf-8" />
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>Question Template</title>
+            <link rel="stylesheet" href="{!URLFOR($Resource.TakeQuestionSetTemplate, 'css/bootstrap.min.css')}" type="text/css" media="all"/>
+        </head>
+        <body>
+            <script src="{!URLFOR($Resource.TakeQuestionSetTemplate, 'js/jquery.min.js')}"></script>
+            <script src="{!URLFOR($Resource.TakeQuestionSetTemplate, 'js/bootstrap.min.js')}"></script>
+            <style type="text/css">
+                .radio-btns label {
+                    min-height: 20px;
+                    padding-left: 20px;
+                    margin-bottom: 0;
+                    font-weight: 400;
+                    cursor: pointer;
+                    font-size: 14px;
+                }
+
+                .radio-btns input[type=radio] {
+                    position: absolute;
+                    margin-left: -20px;
+                    line-height: normal;
+                    margin: 4px 0 0;
+                }
+
+                .radio-btns td {
+                    line-height: 1.42857143;
+                }
+            </style>
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <apex:insert name="header"/>
+                                <apex:insert name="error"/>
+                                <apex:insert name="start"/>
+                                <apex:insert name="body"/>
+                                <apex:insert name="submit"/>
+                                <apex:insert name="end"/>
+                                <apex:insert name="footer"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </body>
+    </html>
+</apex:page>

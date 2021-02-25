@@ -1,0 +1,16 @@
+<apex:page standardController="Contact" showHeader="false" sidebar="false">
+<apex:stylesheet value="{!URLFOR($Resource.RadEx__Default, 'Default.css')}"/>
+<div class="compliatric-container">
+<div class="summary-header">
+    <h2>
+        <apex:outputText value="{!Contact.Name}" />
+        <apex:outputText style="color: red;" value="{!If(Contact.Account.RadEx__do_not_contact__c == true," Do Not Contact (Account)","")}" />
+        <apex:outputText style="color: red;" value="{!If(Contact.DoNotCall == true," Do Not Call","")}" />
+        <apex:outputText style="color: red;" value="{!If(Contact.HasOptedOutOfEmail == true," Do Not Email","")}" />
+        <apex:outputText style="color: darkorange;" value="{!IF(UPPER(Contact.Account.RecordType.Name) != 'PROSPECT',' - COMPLIATRIC CONTACT / PPS: Do Not Contact','')}" />
+        <!--<apex:outputText style="color: darkorange;" value="{!If(UPPER(Contact.Account_Lead_Target__c) == "2018 PROSPECT"," COMPLIATRIC CONTACT / PPS: Do Not Contact","")}" />-->
+    </h2>
+</div>
+</div>
+
+</apex:page>

@@ -1,0 +1,769 @@
+<apex:page controller="AccountsViewerController" standardStylesheets="false"  showHeader="false" sidebar="false" docType="html-5.0">
+    
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+	
+		<head>
+            <meta charset="utf-8" />
+            <meta http-equiv="x-ua-compatible" content="ie=edge" />
+            <title>Accounts Viewer</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+			<apex:slds /> 
+		</head>
+        <style>
+            #introText a {
+                color: #ff6600;
+                text-decoration: none;
+            }
+
+            #introText a:hover {
+                color: #ffb280;
+            }
+
+            #introText ul {
+                display: inline-block;
+            }
+
+            .summaryInfo {
+                position: relative;
+            }
+
+            .summaryInfo div {
+                display: none;
+                position: absolute;
+                top: 0;
+                right:100%;
+                margin-top: -30px; 
+                margin-right: 25px; 
+            }
+
+            .summaryInfo a:hover + div {
+                cursor: pointer;
+                display: block;
+                width: 180px;
+                line-height: 20px;
+                padding: 8px;
+                font-size: 14px;
+                text-align: center;
+                z-index: 999;
+                color: rgb(113, 157, 171);
+                background: rgb(255, 255, 255);
+                border: 4px solid rgb(255, 255, 255);
+                border-radius: 5px;
+                text-shadow: rgba(0, 0, 0, 0.0980392) 1px 1px 1px;
+                box-shadow: #333 -4px 2px 16px 4px;
+                -webkit-transition: opacity 100ms ease-in;
+                -o-transition: opacity 100ms ease-in;
+                -moz-transition: opacity 100ms ease-in;
+                transition: opacity 100ms ease-in;
+                pointer-events: none;
+            }
+
+            .summaryInfo div:after {
+                content: "";
+                position: absolute;
+                width: 0;
+                height: 0;
+                border-width: 10px;
+                border-style: solid;
+                border-color: transparent #FFFFFF transparent transparent;
+                top: 22px;
+                right: -23px;
+                transform:rotate(180deg);
+            }
+
+           .accountCard:hover {
+                box-shadow: -5px 5px 5px 0px #e6e6e6;
+            }
+
+            .dialog-ovelay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.50);
+                z-index: 999999
+            }
+        </style>
+        <apex:pagemessages id="pageMessages" />
+        <apex:form id="form">
+            <body>
+                <div class="slds-scope" >
+                    <div class="slds-page-header">
+                        <div class="slds-page-header__row">
+                            <div class="slds-page-header__col-title">
+                                <div class="slds-media">
+                                    <div class="slds-media__figure">
+                                        <span class="slds-icon_container slds-icon-standard-account" title="account">
+                                            <svg class="slds-icon slds-page-header__icon" aria-hidden="true">
+                                                <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/standard-sprite/svg/symbols.svg#account')}"></use>
+                                            </svg>
+                                            <span class="slds-assistive-text">Accounts</span>
+                                        </span>
+                                    </div>
+                                    <div class="slds-media__body">
+                                        <div class="slds-page-header__name">
+                                            <div class="slds-page-header__name-title">
+                                                <h1>
+                                                    <span class="slds-page-header__title slds-truncate" title="Accounts">Accounts</span>
+                                                </h1>
+                                            </div>
+                                        </div>
+                                        <p class="slds-page-header__name-meta">Account Cards grouped by <span id="groupedType"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="slds-builder-toolbar__actions" aria-label="Document actions">
+                                <a class="slds-button slds-button_brand" href="/home/home.jsp">Go Home</a>
+                            </div>
+                        </div>
+
+                        <br/>
+                        <div class="slds-grid">
+                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right slds-size_small" role="none">
+                                <input type="text" class="slds-input slds-combobox__input" id="searchStr" aria-autocomplete="list" aria-controls="listbox-id-149" autoComplete="off" role="textbox" placeholder="Insert an Account Name" />
+                                <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+                                    <svg class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
+                                        <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/standard-sprite/svg/symbols.svg#search')}"></use>
+                                    </svg>
+                                </span>
+                            </div>
+
+                            <button type="button" class="slds-button slds-button_neutral" onclick="searchAccounts()">Search</button>
+                            <button type="button" class="slds-button slds-button_neutral" onclick="colapsePanel('recordTypes')">View Settings ≣</button>
+                            <apex:selectList styleClass="slds-select" value="{!countRecordsPerPage}" size="1" style="width: 40px;" onchange="showAccounts('')">
+                                <apex:selectOptions value="{!itemsCounts}"/>
+                            </apex:selectList>
+                            <button type="button" class="slds-button slds-button_neutral" onclick="sortRecords()" id="btnSort"></button>
+
+                            <apex:selectList styleClass="slds-select slds-size_small" value="{!selectedFilter}" size="1" id="selectedFilter"  onchange="checkFilter()">
+                                <apex:selectOptions value="{!filtersOptions}"/>
+                            </apex:selectList>
+
+                            <button type="button" class="slds-button slds-button_neutral" onclick="searchAccounts()">Go</button>
+                            <button type="button" class="slds-button" onclick="openFilterDetail()" id="filterDetail">Filter Detail</button>
+                            <apex:outputLink styleClass="slds-button" target="_blank" value="{!$Page.RadEx__FilterDetail}?o={!URLENCODE('Account')}&p={!URLENCODE('AccountCardViewer')}&retURL={!$Page.AccountsCardViewer}">
+                                <apex:outputText value="Create New {!$ObjectType.RadEx__Filter__c.Label}"/>
+                            </apex:outputLink>
+                        </div>
+                    </div>
+
+                    <!-- Alert Panel -->
+                    <apex:outputPanel id="errorPanel">
+                        <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert" id="errorAlert" style="display: none;">
+                            <span class="slds-assistive-text">error</span>
+                            <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                            </span>
+                            <h2 id="errorMessage"></h2>
+                        </div>
+                        <apex:outputPanel rendered="{!showError}">
+                            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                                <span class="slds-assistive-text">error</span>
+                                <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                                </span>
+                                <h2>{!errorMessage}</h2>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                    <!--  Choosing Record Types Panel-->
+                    <article class="slds-card" id="recordTypes">
+                        <apex:pageBlock id="recordTypesPanel">
+                            <apex:inputhidden value="{!settings}" id="HiddenSettings" />
+                            <div class="slds-section slds-is-open">
+                                <h3 class="slds-section__title">
+                                    <button type="button" aria-controls="expando-unique-id" aria-expanded="true" class="slds-button slds-section__title-action">
+                                        <span class="slds-truncate" title="Section Title">Choose Record Types To Show</span>
+                                    </button>
+                                </h3>
+                                <div aria-hidden="false" class="slds-section__content" id="expando-unique-id">
+                                    <div class="slds-grid slds-gutters slds-align_absolute-center slds-p-left_large">
+                                        <div class="slds-col">
+                                            <div class="slds-checkbox">
+                                                <input type="checkbox" name="options" id="emptyTypes" value=""/>
+                                                <label class="slds-checkbox__label" for="emptyTypes">
+                                                    <span class="slds-checkbox_faux"></span>
+                                                    <span class="slds-form-element__label">Show Empty Record Types</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="slds-col">
+                                            <div class="slds-checkbox">
+                                                <input type="checkbox" name="options" id="primaryContact" value="" />
+                                                <label class="slds-checkbox__label" for="primaryContact">
+                                                    <span class="slds-checkbox_faux"></span>
+                                                    <span class="slds-form-element__label">Show Primary Contact</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="slds-col">
+                                            <div class="slds-checkbox">
+                                                <input type="checkbox" name="options" id="myAccount" value="" />
+                                                <label class="slds-checkbox__label" for="myAccount">
+                                                    <span class="slds-checkbox_faux"></span>
+                                                    <span class="slds-form-element__label">Show My Accounts</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="slds-col">
+                                            <div class="slds-checkbox">
+                                                <input type="checkbox" name="options" id="activeAccount" value="" />
+                                                <label class="slds-checkbox__label" for="activeAccount">
+                                                    <span class="slds-checkbox_faux"></span>
+                                                    <span class="slds-form-element__label">Show Only Active Accounts</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div><br/>
+
+                                    <div class="slds-grid slds-gutters slds-align_absolute-center slds-p-left_large">
+                                        <div class="slds-col">
+                                            <label class="slds-checkbox__label">
+                                                <span class="slds-checkbox_faux"></span>
+                                                <span class="slds-form-element__label">View Fields Set</span>
+                                            </label>
+                                            <apex:selectList styleClass="slds-select slds-size_small" value="{!selectedFieldSet}" size="1">
+                                                <apex:selectOptions value="{!allFieldSets}"/>
+                                            </apex:selectList>
+                                        </div>
+
+                                        <div class="slds-col">
+                                            <label class="slds-checkbox__label">
+                                                <span class="slds-checkbox_faux"></span>
+                                                <span class="slds-form-element__label">Filter by User</span>
+                                            </label>
+                                            <apex:selectList styleClass="slds-select slds-size_small" value="{!selectedUser}" size="1" id="userFilter">
+                                                <apex:selectOptions value="{!allUsers}"/>
+                                            </apex:selectList>
+                                        </div>
+                                    </div>
+
+                                    <label class="slds-align_absolute-center slds-text-heading_mediumm slds-form-element__label">
+                                        <span style="font-size: 15px;">Record Types</span>
+                                    </label>
+                                    <apex:pageBlockSection columns="3">
+                                        <apex:repeat var="typeId" value="{!recTypes}"> 
+                                            <apex:pageBlockSectionItem >
+                                                <div class="slds-grid slds-align_absolute-center">
+                                                    <div class="slds-col slds-size_1-of-6 slds-align_absolute-center">
+                                                        <div class="slds-checkbox_add-button">
+                                                            <input class="slds-assistive-text" type="checkbox" id="{!typeId}" value="{!typeId}" onclick="checkRecordType(this)"/>
+                                                            <label for="{!typeId}" class="slds-checkbox_faux">
+                                                                <span class="slds-assistive-text"></span>
+                                                            </label>
+                                                        </div> 
+                                                    </div>
+                                                    <div class="slds-col slds-size_5-of-6">
+                                                        <span class="slds-float_left">{!recTypes[typeId]}</span>
+                                                    </div>
+                                                </div>
+                                            </apex:pageBlockSectionItem>
+                                        </apex:repeat>
+                                    </apex:pageBlockSection><br/>
+
+                                    <div class="slds-col slds-p-left_large">
+                                        <span>
+                                            <label class="slds-checkbox__label">
+                                                <span class="slds-checkbox_faux"></span>
+                                                <span class="slds-form-element__label">Select Presentation Option</span>
+                                            </label>
+                                            <apex:selectList styleClass="slds-select slds-size_small" value="{!selectedPresentation}" size="1" id="presentationType" onchange="changePresentation()">
+                                                <apex:selectOptions value="{!presentationOptions}"/>
+                                            </apex:selectList>
+                                        </span>
+                                        
+                                        <span id="dateFieldsBlock" style="display:none;"> 
+                                            <label class="slds-checkbox__label">
+                                                <span class="slds-checkbox_faux"></span>
+                                                <span class="slds-form-element__label">Select Date Field</span>
+                                            </label>
+                                            <apex:selectList styleClass="slds-select slds-size_small" value="{!selectedDateField}" size="1" id="dateField">
+                                                <apex:selectOptions value="{!allDateFields}"/>
+                                            </apex:selectList>
+                                        </span>    
+                                    </div>
+                                    <button type="button" class="slds-button slds-button_brand slds-align_absolute-center" onclick="showAccounts('')">Show Accounts</button><br/> 
+                                </div>
+                            </div>
+                        </apex:pageBlock>
+                    </article>
+                    
+                    <!--  Account RecordTypes Path Panel-->
+                    <apex:outputPanel id="accountPanel">
+                        <div style="border: 2px solid #e6e6e6; border-radius: 5px; box-shadow: 0px 2px 2px #e6e6e6; background-color: #f2f2f2;">
+                            <article class="slds-card" id="accountCards">
+                                <div style="overflow-x: auto; width: 99vw; height: 85vh">
+                                    <div class="slds-path">
+                                        <div class="slds-grid slds-path__track">
+                                            <div class="slds-grid slds-path__scroller-container">
+                                                <div class="slds-path__scroller" role="application">
+                                                    <div class="slds-path__scroller_inner">
+                                                        <ul class="slds-path__nav" role="listbox" aria-orientation="horizontal">
+                                                            <apex:repeat var="recId" value="{!AccountRecords}"> 
+                                                                <li class="slds-path__item slds-is-current slds-is-active slds-size_large" role="presentation">
+                                                                    <a aria-selected="true" class="slds-path__link" href="javascript:void(0);" id="path-1" role="option" tabindex="0">
+                                                                        <apex:outputPanel rendered="{!selectedPresentation == 'record_type'}">
+                                                                            <span class="slds-path__title">{!recTypes[recId]}  ({!AccountRecords[recId].countRecord})</span>
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!selectedPresentation == 'owner'}">
+                                                                            <span class="slds-path__title">{!ownersIds[recId]}  ({!AccountRecords[recId].countRecord})</span>
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!selectedPresentation != 'record_type' && selectedPresentation != 'owner'}">
+                                                                            <span class="slds-path__title">{!recId}  ({!AccountRecords[recId].countRecord})</span>
+                                                                        </apex:outputPanel>
+                                                                    </a>
+                                                                </li>
+                                                            </apex:repeat>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--  Account Cards Panel-->
+                                    <div>
+                                        <div class="slds-grid">
+                                            <div class="slds-grid">
+                                                <div role="application">
+                                                    <div>
+                                                        <ul class="slds-path__nav" role="listbox" aria-orientation="horizontal">
+                                                            <apex:repeat var="recId" value="{!AccountRecords}">
+                                                                <li style="width: 410px;" role="presentation">
+                                                                    <apex:outputPanel rendered="{!AccountRecords[recId].hasPrevious}">                                                               
+                                                                        <button type="button" style="width: 410px" aria-controls="expando-unique-id" aria-expanded="true" class="slds-button slds-p-left_small slds-align_absolute-center" onclick="getPreviousRecords('{!recId}')">
+                                                                            <span class="slds-truncate" title="Previous">︽</span>
+                                                                        </button>
+                                                                    </apex:outputPanel>
+                                                                    <apex:outputPanel rendered="{!!AccountRecords[recId].hasPrevious}">  
+                                                                        <button type="button" style="width: 410px" class="slds-button slds-p-left_small slds-align_absolute-center" disabled="true">
+                                                                            <span class="slds-truncate" title="Previous">︽</span>
+                                                                        </button>
+                                                                    </apex:outputPanel>
+
+                                                                    <!-- Start Scrolable Content-->
+                                                                    <div class="slds-scrollable" style="height: 70vh; width: 410px;" ondrop="drop(event, '{!recId}')" ondragover="allowDrop(event)" id="{!recId}">
+                                                                        <apex:repeat var="acc" value="{!AccountRecords[recId].accounts}">
+                                                                            <div class="slds-p-left_small slds-p-bottom_small" style="width: 390px;" draggable="true" ondragstart="drag(event)" id="{!acc.Id}">
+                                                                                <article class="slds-card">
+                                                                                    <div class="accountCard" style="border: 2px solid #e6e6e6; border-radius: 5px; background-color: white;">
+                                                                                        <div class="slds-card__header slds-grid">
+                                                                                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                                                                <div class="slds-media__figure">
+                                                                                                    <span class="slds-icon_container" title="account">
+                                                                                                        <span>
+                                                                                                            <img alt="" src="{!acc.Owner.SmallPhotoUrl}" title="{!acc.Name}" height="40" width="40"/>
+                                                                                                        </span>
+                                                                                                        <span class="slds-assistive-text">{!acc.Name}</span>
+                                                                                                    </span>
+                                                                                                </div>
+                                                                                                <div class="slds-media__body">
+                                                                                                    <h3 class="slds-card__header-title">
+                                                                                                        <a href="/{!acc.Id}" class="slds-card__header-link" title="{!acc.Name}" target="_blank">
+                                                                                                            <dt class="slds-truncate" style="font-weight:bold; font-size:12px;">{!acc.Name}</dt>
+                                                                                                        </a>
+                                                                                                    </h3>
+                                                                                                </div>
+                                                                                                <div class="slds-no-flex">
+                                                                                                    <div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                                                                                                        <button type="button" class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More" onclick="showMultiAction('{!'multiAction' + acc.Id}')">
+                                                                                                            <span>▼</span>
+                                                                                                        </button>
+                                                                                                        <div class="slds-dropdown slds-dropdown_actions slds-dropdown_right" id="{!'multiAction' + acc.Id}" style="display:none;">
+                                                                                                            <ul class="slds-dropdown__list" role="menu">
+                                                                                                                <li class="slds-dropdown__item" role="presentation">
+                                                                                                                    <apex:outputLink value="/{!acc.Id}" target="_blank">Open</apex:outputLink>
+                                                                                                                </li>
+                                                                                                                <li class="slds-dropdown__item" role="presentation">
+                                                                                                                    <a href="{!$Page.AccountFieldManagement}?id={!acc.Id}&fieldSet={!URLENCODE(selectedFieldSet)}&retURL={!$Page.AccountsCardViewer}" role="menuitem" tabindex="0">
+                                                                                                                        <span class="slds-truncate" title="Edit">Edit</span>
+                                                                                                                    </a>
+                                                                                                                </li>
+                                                                                                            </ul>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </header>
+                                                                                        </div>
+
+                                                                                        <div class="slds-card__body slds-card__body_inner">
+                                                                                            <div class="slds-tile__detail">
+                                                                                                <dl class="slds-list_horizontal slds-wrap">
+                                                                                                    <apex:repeat var="f" value="{!orderedFilds}">
+                                                                                                        <apex:outputPanel rendered="{!f!='RadEx__Next_Action_Date__c' && f!='Next_Action_Date__c'}">
+                                                                                                            <div class="slds-grid slds-gutters">
+                                                                                                                <div class="slds-col">
+                                                                                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" style="width: 160px" title="{!setFields[f]}">{!setFields[f]}:</dt>
+                                                                                                                </div>
+                                                                                                                <div class="slds-col">
+                                                                                                                    <dd class="slds-item_detail slds-truncate" style="width: 165px" title="{!acc[f]}"><apex:outputField value="{!acc[f]}" title="{!acc[f]}"/></dd>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </apex:outputPanel>
+                                                                                                        <apex:outputPanel rendered="{!f=='RadEx__Next_Action_Date__c' || f=='Next_Action_Date__c'}">
+                                                                                                            <div class="slds-grid slds-gutters">
+                                                                                                                <div class="slds-col">
+                                                                                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" style="width: 160px" title="{!setFields[f]}">{!setFields[f]}:</dt>
+                                                                                                                </div>
+                                                                                                                <div class="slds-col">
+                                                                                                                    <dd class="slds-item_detail slds-truncate" style="width: 165px; color:{! IF( acc[f] == NULL, 'black' , IF( acc[f] <= TODAY(), 'red' ,'black'))};" title="{!acc[f]}">
+                                                                                                                        <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                                                                                                            <apex:param value="{!acc[f]}" />
+                                                                                                                        </apex:outputText>
+                                                                                                                    </dd>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </apex:outputPanel>
+                                                                                                    </apex:repeat>
+                                                                                                </dl>
+                                                                                            </div>
+                                                                                            <apex:outputPanel rendered="{!showPrimaryContact}">
+                                                                                                <div class="slds-grid slds-wrap">
+                                                                                                    <div class="slds-col slds-size_12-of-12">
+                                                                                                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-align_absolute-center" title="Primary Contact Information">Primary Contact Info</dt>
+                                                                                                    </div>
+                                                                                                    <div class="slds-col slds-size_12-of-12">
+                                                                                                        <div class="slds-tile__detail">
+                                                                                                            <dl class="slds-list_horizontal slds-wrap">
+                                                                                                                <dt class="slds-item_label slds-text-color_weak slds-truncate" style="width: 90px" title="Contact Name">Name:</dt>
+                                                                                                                <dd class="slds-item_detail slds-truncate" style="width: 235px" title="{!acc.RadEx__Default_Survey_Contact__r.Phone}">
+                                                                                                                    <h2 class="slds-card__header-title">
+                                                                                                                        <a href="/{!acc.RadEx__Default_Survey_Contact__r.Id}" class="slds-card__header-link slds-truncate" title="{!acc.RadEx__Default_Survey_Contact__r.Name}">
+                                                                                                                            <span>{!acc.RadEx__Default_Survey_Contact__r.Name}</span>
+                                                                                                                        </a>
+                                                                                                                    </h2>
+                                                                                                                </dd>
+                                                                                                                <dt class="slds-item_label slds-text-color_weak slds-truncate" style="width: 90px" title="Contact Phone">Phone:</dt>
+                                                                                                                <dd class="slds-item_detail slds-truncate" style="width: 235px" title="{!acc.RadEx__Default_Survey_Contact__r.Phone}">{!acc.RadEx__Default_Survey_Contact__r.Phone}</dd>
+                                                                                                                <dt class="slds-item_label slds-text-color_weak slds-truncate" style="width: 90px" title="Contact Email">Email:</dt>
+                                                                                                                <dd class="slds-item_detail slds-truncate" style="width: 235px" title="{!acc.RadEx__Default_Survey_Contact__r.Email}">{!acc.RadEx__Default_Survey_Contact__r.Email}</dd>
+                                                                                                            </dl>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </apex:outputPanel>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </article>
+                                                                            </div>
+                                                                        </apex:repeat> 
+                                                                    </div>
+                                                                    <!-- End Scrolable Content-->
+                                                                    
+                                                                    <apex:outputPanel rendered="{!AccountRecords[recId].hasNext}"> 
+                                                                        <button type="button" style="width: 410px" aria-controls="expando-unique-id" aria-expanded="true" class="slds-button slds-p-left_small slds-align_absolute-center" onclick="getNextRecords('{!recId}')">
+                                                                            <span class="slds-truncate" title="Next">︾</span>
+                                                                        </button>
+                                                                    </apex:outputPanel>
+                                                                     <apex:outputPanel rendered="{!!AccountRecords[recId].hasNext}"> 
+                                                                        <button type="button" style="width: 410px" disabled="true" class="slds-button slds-p-left_small slds-align_absolute-center">
+                                                                            <span class="slds-truncate" title="Next">︾</span>
+                                                                        </button>
+                                                                    </apex:outputPanel>
+                                                                </li>
+                                                            </apex:repeat>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </apex:outputPanel>
+                </div>
+            </body>
+
+            <apex:actionFunction action="{!doShowRecords}" name="showRecords" rerender="accountPanel,errorPanel">
+                <apex:param name="setTypes" value="" assignTo="{!selectedRTypes}"/>
+                <apex:param name="searchVal" value="" assignTo="{!searchValue}"/>
+                <apex:param name="emptyRec" value="" assignTo="{!showEmptyTypes}"/>
+                <apex:param name="primCon" value="" assignTo="{!showPrimaryContact}"/>
+                <apex:param name="myAcc" value="" assignTo="{!showMyAccounts}"/>
+                <apex:param name="onlyActive" value="" assignTo="{!activeOnly}"/>
+            </apex:actionFunction>
+            <apex:actionFunction action="{!next}" name="doNextAction" rerender="accountPanel">
+                <apex:param name="idType" value="" assignTo="{!selectedIdType}"/>
+            </apex:actionFunction>
+            <apex:actionFunction action="{!previous}" name="doPreviousAction" rerender="accountPanel">
+                <apex:param name="idType" value="" assignTo="{!selectedIdType}"/>
+            </apex:actionFunction>
+            <apex:actionFunction action="{!sortingTable}" name="sortTable" rerender="accountPanel"/>
+            <apex:actionFunction action="{!doChangeCard}" name="changeRecordType" rerender="accountPanel,errorPanel">
+                <apex:param name="idAccountCard" value="" assignTo="{!selectedAccountCard}"/>
+                <apex:param name="recType" value="" assignTo="{!selectedRecordType}"/>
+                <apex:param name="nextDate" value="" assignTo="{!selectedDate}"/>
+            </apex:actionFunction>
+        </apex:form>
+        <apex:includeScript value="{!URLFOR($Resource.RadEx__MassEditor, 'js/jquery_min.js')}" />
+	    <apex:includeScript value="{!URLFOR($Resource.RadEx__MassEditor, 'js/jquery_blockUI.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.RadEx__jqueryLibrary, 'v2.1.4/jquery-2.1.4.min.js')}"/>
+	    <apex:includeScript value="{!URLFOR($Resource.RadEx__jqueryUiLibrary, 'v1.11.4/jquery-ui.min.js')}" />
+        <script>
+            $j_tg = jQuery.noConflict();
+
+			$j_tg.getScript('{!URLFOR($Resource.RadEx__MassEditor, 'js/jquery_blockUI.js')}');
+
+            $j_tg(document.getElementById("btnSort")).html("Sort ▼");
+            var selectedTypes = new Set();
+
+            if({!IF(showCards, "true", "false")}) {
+                $j_tg(document.getElementById('recordTypes')).hide();
+                $j_tg(document.getElementById('accountCards')).show();
+
+                var settings =  JSON.parse(document.getElementById('{!$Component.form.recordTypesPanel.HiddenSettings}').value);
+                var recortTypeSet = JSON.parse(settings["recordTypeSet"]);
+
+                document.getElementById('emptyTypes').checked = settings["showEmptyTypes"] === "true";
+                document.getElementById('primaryContact').checked = settings["showPrimaryContact"] === "true";
+                document.getElementById('myAccount').checked = settings["showMyAccounts"] === "true";
+                document.getElementById('activeAccount').checked = settings["activeOnly"] === "true";
+                if(settings["presentationType"] === "date") {
+                    $j_tg(document.getElementById('dateFieldsBlock')).show();
+                }
+
+                document.getElementById('groupedType').innerHTML = document.getElementById('{!$Component.form.recordTypesPanel.presentationType}')[document.getElementById('{!$Component.form.recordTypesPanel.presentationType}').selectedIndex].innerHTML;
+
+                if(document.getElementById('{!$Component.form.selectedFilter}').value == "All") {
+                    $j_tg(document.getElementById('filterDetail')).hide();
+                }
+
+                recortTypeSet.forEach(element => {
+                    document.getElementById(element).checked = true;
+                    selectedTypes.add(element);
+                });
+            } else { 
+                $j_tg(document.getElementById('accountCards')).hide();
+            }
+
+            function colapsePanel(strId) {
+                if($j_tg(document.getElementById(strId)).is(":visible")) {
+                    $j_tg(document.getElementById(strId)).hide();
+                } else {
+                    $j_tg(document.getElementById(strId)).show();
+                } 
+            }
+
+            function showMultiAction(idPanel) {
+                if($j_tg(document.getElementById(idPanel)).is(":visible")) {
+                    $j_tg(document.getElementById(idPanel)).hide();
+                } else {
+                    $j_tg(document.getElementById(idPanel)).show();
+                } 
+            }
+
+            function showStatusInfo(idPanel) {
+                if($j_tg(document.getElementById(idPanel)).is(":visible")) {
+                    $j_tg(document.getElementById(idPanel)).hide();
+                } else {
+                    $j_tg(document.getElementById(idPanel)).show();
+                }
+            }
+
+            function getNextRecords(strId) {
+                doNextAction(strId);
+            }
+
+            function getPreviousRecords(strId) {
+                doPreviousAction(strId);
+            }
+
+            function showAccounts(str) {
+                $j_tg(document.getElementById("errorAlert")).hide();
+                document.getElementById('errorMessage').innerHTML = "";
+
+                var presentType = document.getElementById('{!$Component.form.recordTypesPanel.presentationType}').value;
+                var dateField = document.getElementById('{!$Component.form.recordTypesPanel.dateField}').value;
+
+                var userFilter = document.getElementById('{!$Component.form.recordTypesPanel.userFilter}').value;
+                if(document.getElementById('myAccount').checked && userFilter) {
+                    $j_tg(document.getElementById("errorAlert")).show();
+                    document.getElementById('errorMessage').innerHTML = "You must select only one parameter either \"Show My Accounts\" or \"Filter by User\".";
+                    return;
+                }
+
+                if(presentType === 'date' && !dateField) {
+                    $j_tg(document.getElementById("errorAlert")).show();
+                    document.getElementById('errorMessage').innerHTML = "You must select a date field to display accounts by date.";
+                } else {
+                    if(selectedTypes.size) {
+                        $j_tg(document.getElementById('recordTypes')).hide();
+                        $j_tg(document.getElementById('accountCards')).show();
+                        var selected = [];
+                        selectedTypes.forEach(function(element) {
+                            selected.push(element);
+                        });
+                        showRecords(JSON.stringify(selected),
+                                    str,
+                                    document.getElementById('emptyTypes').checked, 
+                                    document.getElementById('primaryContact').checked,
+                                    document.getElementById('myAccount').checked,
+                                    document.getElementById('activeAccount').checked);
+                    } else {
+                        $j_tg(document.getElementById("errorAlert")).show();
+                        document.getElementById('errorMessage').innerHTML = "You must select at least one record type.";
+                    }
+                }
+                document.getElementById('groupedType').innerHTML = document.getElementById('{!$Component.form.recordTypesPanel.presentationType}')[document.getElementById('{!$Component.form.recordTypesPanel.presentationType}').selectedIndex].innerHTML;
+            }
+
+            function changeCountRecords() {
+                showAccounts();
+            }
+
+            function checkRecordType(elem) {
+                if(elem.checked) {
+                    selectedTypes.add(elem.value);
+                } else {
+                    selectedTypes.delete(elem.value);
+                }
+            }
+
+            function sortRecords() {
+                $j_tg(document.getElementById("errorAlert")).hide();
+                document.getElementById('errorMessage').innerHTML = "";
+                if(selectedTypes.size) {
+                    if($j_tg(document.getElementById("btnSort")).html() === "Sort ▼") {
+                        $j_tg(document.getElementById("btnSort")).html("Sort ▲");
+                    } else {
+                        $j_tg(document.getElementById("btnSort")).html("Sort ▼");
+                    }
+                    sortTable();
+                } else {
+                    $j_tg(document.getElementById("errorAlert")).show();
+                    document.getElementById('errorMessage').innerHTML = "You must select at least one record type.";
+                }  
+            }
+
+            function searchAccounts() {
+                $j_tg(document.getElementById("errorAlert")).hide();
+                document.getElementById('errorMessage').innerHTML = "";
+                var str = document.getElementById('searchStr').value;
+                if(str.length === 1) {
+                    $j_tg(document.getElementById("errorAlert")).show();
+                    document.getElementById('errorMessage').innerHTML = "The search string must be at least 2 characters long.";
+                } else {
+                    showAccounts(str);
+                }
+            }
+
+            function drag(ev) {
+                ev.dataTransfer.setData("text", ev.target.id);
+            }
+
+            function allowDrop(ev) {
+                ev.preventDefault();
+            }
+
+            function drop(ev, typeId) {
+                ev.preventDefault();
+                var data = ev.dataTransfer.getData("text");
+                confirmChangeRecord(data, typeId);
+            }
+
+            function changePresentation() {
+                if(document.getElementById('{!$Component.form.recordTypesPanel.presentationType}').value == "date") {
+                    $j_tg(document.getElementById("dateFieldsBlock")).show();
+                } else {
+                    $j_tg(document.getElementById("dateFieldsBlock")).hide();
+                }
+            }
+
+            function openFilterDetail() {
+                if(document.getElementById('{!$Component.form.selectedFilter}').value != "All") {
+                    var url = '{!$Page.RadEx__FilterDetail}?id=' + document.getElementById('{!$Component.form.selectedFilter}').value + '&retURL={!$Page.AccountsCardViewer}';
+                    $j_tg(document.getElementById("errorAlert")).hide();
+                    document.getElementById('errorMessage').innerHTML = "";
+                    window.open(url, '_top');
+                } else {
+                    $j_tg(document.getElementById("errorAlert")).show();
+                    document.getElementById('errorMessage').innerHTML = "You must select a filter to open details.";
+                }
+            }
+
+            function checkFilter() {
+                if(document.getElementById('{!$Component.form.selectedFilter}').value == "All") {
+                    $j_tg(document.getElementById('filterDetail')).hide();
+                } else {
+                    $j_tg(document.getElementById('filterDetail')).show();
+                }
+            }
+
+            function confirmChangeRecord(accountCard, recordType) {
+                if(recordType == "undefined") {
+                    return;
+                }
+                var presentType = document.getElementById('{!$Component.form.recordTypesPanel.presentationType}').value;
+
+                var content =  "<div class='dialog-ovelay'>" +
+                                    "<div class='slds-modal__container'><header class='slds-modal__header'>";
+                                    if(presentType === "date") {
+                                        content += "<h3>Change Next Review Action.</h3>";
+                                    } else {
+                                        content += "<h3>Change Record.</h3>";
+                                    }
+                                        content += "</header>" +
+                                        "<div class='slds-modal__content slds-p-around_medium'>" +
+                                            " <p>Are you sure you want to change record?</p> ";
+                                            if(presentType === "date") {
+                                                var d = new Date();
+                                                var strDate = '';
+                                                switch(recordType) {
+                                                    case "Due Tomorrow":
+                                                        d.setDate(d.getDate() + 1);
+                                                        strDate = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+                                                        break;
+                                                    case "Due in 2 Days":
+                                                        d.setDate(d.getDate() + 2);
+                                                        strDate = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+                                                        break;
+                                                    case "Due in 3 Days":
+                                                        d.setDate(d.getDate() + 3);
+                                                        strDate = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+                                                        break;
+                                                    case "Due in 4 Days":
+                                                        d.setDate(d.getDate() + 4);
+                                                        strDate = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+                                                        break;
+                                                }
+                                                content += "<input class='slds-input' style='width: 200px' type='date' id='actionDate' name='Next Review Action' value='" + strDate + "'>";
+                                            }
+
+                                        content += "<div class='slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error' style='display: none; colour: red;' id='errorDate'><strong>Error: </strong>You must enter a date.</div>"+
+                                        "</div>" +
+                                        "<footer class='slds-modal__footer'>" +
+                                            "<button class='slds-button slds-button_success doAction'>Ok</button> " +
+                                            "<button class='slds-button slds-button_neutral cancelAction'>Cancel</button> " +
+                                        "</footer>" +
+                                    "</div>" +
+                                "</div>";
+                $('body').prepend(content);
+                $('.doAction').click(function () {
+                    document.getElementById("errorDate").style.display = "none";
+                    if(presentType === "date") {
+                        if(document.getElementById('actionDate').value) {
+                            changeRecordType(accountCard, recordType, document.getElementById('actionDate').value);
+                            $(this).parents('.dialog-ovelay').fadeOut(200, function () {
+                                $(this).remove();
+                            });
+                        } else {
+                            document.getElementById("errorDate").style.display = "block";
+                        }
+                    } else {
+                        changeRecordType(accountCard, recordType, '');
+                        $(this).parents('.dialog-ovelay').fadeOut(200, function () {
+                            $(this).remove();
+                        });
+                    }
+                });
+                $('.cancelAction, .fa-close').click(function () {
+                    document.getElementById("errorDate").style.display = "none";
+                    $(this).parents('.dialog-ovelay').fadeOut(200, function () {
+                        $(this).remove();
+                    });
+                });
+            }
+        </script>
+	</html>
+</apex:page>

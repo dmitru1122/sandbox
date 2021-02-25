@@ -1,0 +1,78 @@
+<template>
+	<lightning-card title="Statistics User Report" icon-name="standard:account">
+	
+		<p class="slds-p-horizontal_small">
+
+		</p>
+		<p slot="actions">
+				
+			<lightning-input type="date" name="inputStartDate" label="Start Date" value={startDate} onchange={handleStartDateChange} is-loading={showLoading}></lightning-input>
+			<lightning-input type="date" name="inputStartEnd" label="End Date" value={endDate}  onchange={handleEndDateChange} is-loading={showLoading}></lightning-input>
+			<lightning-badge label="Select months to report"></lightning-badge>
+
+			<lightning-record-edit-form object-api-name="RadEx__Metrics__c">
+				<lightning-input-field field-name="RadEx__Organization__c" value={accountSearch}  onchange={handleAccountChange} ></lightning-input-field>
+			</lightning-record-edit-form>
+		</p>
+	</lightning-card>
+
+	<template if:true={showLoading}>
+		<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner> 
+	</template>
+
+	<template if:false={showLoading}>
+	<div class="slds-box slds-theme_default slds-box_xx-small">
+		<template if:true={fields}>
+
+		<div class="slds-m-around_x-small" >
+
+			<div class="slds-scrollable_x" >
+			<table class="slds-table slds-table_cell-buffer slds-table_bordered">
+				<thead>
+					<tr class="slds-line-height_reset">
+
+						<th scope="col">
+							<div title="Account Name">Account Name</div>
+						</th>
+						<th scope="col">
+							<div title="Record Report">Record Report</div>
+						</th>
+
+						<template for:each={fields} for:item="field" >
+							<th scope="col" key={field.FieldApiName}>
+								<div class="slds-truncate" title={field.FieldName}>{field.FieldName}</div>
+							</th>
+						</template>
+					</tr>
+					</thead>
+					<tbody>
+						<template for:each={data_records} for:item="fieldResult" if:true={data_records}>
+							<tr class="slds-hint-parent" key={fieldResult.key}>
+								<td>
+									<div class="slds-truncate"> 
+										<a tabindex="-1" onclick={openRecord} data-id={fieldResult.key} > {fieldResult.accName} </a>
+									</div>
+								</td>
+								<td>
+									<div class="slds-truncate"> 
+										<a tabindex="-1" onclick={openRecord} data-id={fieldResult.Id} > Report Record </a>
+									</div>
+								</td>
+								<template for:each={fieldResult.value} for:item="field"  >
+									<td data-label={field.value}  key={field.value}>
+										<div class="slds-truncate" title={field.value}>  {field.value} </div>
+									</td>
+								</template>
+							</tr>
+						</template>
+					</tbody>
+			  </table>
+			</div>
+		</div>
+	</template>
+	</div>
+</template>
+
+
+
+</template>

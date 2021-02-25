@@ -1,0 +1,220 @@
+<aura:component controller = "HubMemberController" implements="flexipage:availableForAllPageTypes" access="global">
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+
+    <aura:attribute name="dataForTable" type="List" />
+    <aura:attribute name="deployDisabled" type="Boolean" default="true" />
+    <aura:attribute name="dataMapArray" type="List" />
+    <aura:attribute name="activeSections" type="List"/>
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="statusesLoading" type="boolean" default="false"/>
+    <aura:attribute name="deployData" type="Object"/>
+    <aura:attribute name="deployDataText" type="String"/>
+    <aura:attribute name="selectedCount" type="integer" default="0" />
+    <aura:attribute name="isValidateMode" type="boolean" default="false"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>   
+
+    <div class="slds-box slds-theme_default">
+        <div class="slds-p-left_xx-large slds-p-right_xx-large">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-3">
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                    <div class="slds-text-align_center">
+                        <lightning:button label="New Authorization" title="Authorize" onclick="{! c.authOrg }" />
+                        <lightning:button label="Validation" title="Validation" disabled="{!v.deployDisabled}" onclick="{! c.openValidateModal }" />
+                        <lightning:button label="Deploy" title="Deploy" disabled="{!v.deployDisabled}" onclick="{! c.openDeployModal }" />
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                </div>
+            </div>
+        </div>
+
+        <div class="refreshing">
+            <aura:if isTrue="{!v.statusesLoading}">
+                <div class="slds-grid slds-grid_vertical-align-center slds-p-top_small slds-p-bottom_small slds-p-right_xx-large slds-wrap">
+                    <div class="slds-col slds-float_right slds-p-right_small slds-size_1-of-2">
+                        <div class="isActivityLoadingRight">
+                            <lightning:spinner alternativeText="Loading" size="small" />
+                        </div>
+                    </div>
+                    <div class="slds-col slds-float_left slds-p-left_small slds-size_1-of-2">
+                        Refreshing...
+                    </div>
+                </div>
+            </aura:if>
+        </div>
+        
+        <div class="slds-grid slds-p-right_xx-large slds-wrap">
+            <!-- TABLE -->
+            <aura:iteration items="{!v.dataMapArray}" var="item" indexVar="groupIndex">
+                <div class="slds-col slds-p-top slds-p-left_xx-large slds-text-heading_medium slds-p-bottom_x-small slds-size_1-of-1">
+                    <div class="slds-p-top_x-large">
+                        <aura:if isTrue="{!item.key != 'UNLINKED'}">
+                            <aura:if isTrue="{!item.authorized}">
+                                <div class="{!item.colorClass}" title="{!item.key}">
+                                    {!item.key} ({!item.countAuth}/{!item.count}) Selected: {!item.selectedCount}
+                                    &nbsp;
+                                    <lightning:buttonMenu class="slds-button_last" alternativeText="Show menu" iconName="utility:list" iconSize="small" menuAlignment="left" onselect="{! c.handleMenuSelect }">
+                                        <lightning:menuItem class="dropdown_button" label="Open in browser" value="{!item.orgId + '/openInBrowser'}" />
+                                    </lightning:buttonMenu>
+                                </div>
+                                <aura:set attribute="else">
+                                    <div class="slds-text-color_error slds-truncate'}" title="{!item.key}">{!item.key} ({!item.countAuth}/{!item.count}) - Unauthorized source org</div>
+                                </aura:set>
+                            </aura:if>
+                            
+                            <aura:set attribute="else">
+                                <div class="{!item.colorClass + ' slds-truncate'}" title="{!item.key}">{!item.key}</div>
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                </div>
+
+                <!-- HEADER -->
+                <div class="slds-col slds-size_2-of-12 slds-float_right">
+                    <div class="{!item.colorClass + ' slds-truncate slds-p-bottom_small slds-text-heading_large slds-text-title_caps'}" title=""></div>
+                </div>
+                <!-- checkbox header -->
+                <div class="slds-col slds-p-right_x-small slds-size_2-of-12">
+                    <div class="slds-clearfix">
+                        <div class="slds-float_right">
+                            <aura:if isTrue="{!and(item.key != 'UNLINKED', item.authorized)}">
+                                <lightning:input type="checkbox" aura:id="groups" label="" onchange="{!c.groupChange}" name="{!groupIndex}" checked="false"/>
+                            </aura:if>
+                        </div>
+                    </div> 
+                </div>
+                <div class="slds-col slds-p-right_x-small slds-size_5-of-12"></div>
+                <!-- headers -->
+                <div class="slds-col slds-size_3-of-12">
+                    <div class="{!item.colorClass + ' slds-truncate slds-p-bottom_small slds-text-heading_large slds-text-title_caps'}" title="Organisation Name">Organization Name</div>
+                </div>
+                <div class="slds-col slds-size_1-of-12">
+                    <div class="{!item.colorClass + ' slds-truncate slds-p-bottom_small slds-text-heading_large slds-text-title_caps'}" title="Authorized On">Authorized On</div>
+                </div>
+                <div class="slds-col slds-size_1-of-12">
+                    <div class="{!item.colorClass + ' slds-truncate slds-p-bottom_small slds-text-heading_large slds-text-title_caps'}" title="Last Success">Last Success</div>
+                </div>
+                <div class="slds-col slds-size_1-of-12">
+                    <div class="{!item.colorClass + ' slds-truncate slds-p-bottom_small slds-text-heading_large slds-text-title_caps'}" title="Last Failure">Last Failure</div>
+                </div>
+                <div class="slds-col slds-size_1-of-12">
+                    <div class="{!item.colorClass + ' slds-truncate slds-p-bottom_small slds-text-heading_large slds-text-title_caps'}" title="Duration">Duration</div>
+                </div>
+                <div class="slds-col slds-size_4-of-12">
+                    <div class="{!item.colorClass + ' slds-truncate slds-p-bottom_small slds-text-heading_large slds-text-title_caps'}" title=""></div>
+                </div>
+
+                <!-- BODY -->
+                <aura:iteration items="{!item.data}" var="dataItem" indexVar="orgIndex">
+                    <aura:if isTrue="{!not(dataItem.isSource)}">
+                        <!-- progress -->
+                        <div class="slds-col slds-p-top_small slds-p-bottom_x-small slds-size_2-of-12 slds-float_right">
+                            <aura:if isTrue="{!dataItem.progress}">
+                                <div class="isActivityLoading progressCol slds-p-left_x-large">
+                                    <lightning:spinner alternativeText="Loading" size="small" />
+                                </div>
+                            </aura:if>
+                        </div>
+
+                        <!-- checkbox data -->
+                        <div class="slds-col slds-p-top_x-small slds-p-right_x-small slds-size_2-of-12">
+                            <aura:if isTrue="{!and(dataItem.authorized, item.authorized)}">
+                                <div class="slds-clearfix">
+                                    <div class="slds-float_right">
+                                        <aura:if isTrue="{!and(item.key != 'UNLINKED', dataItem.key != 'UNLINKED')}">
+                                            <lightning:input type="checkbox" label="" name="{!orgIndex + '/' + groupIndex}" checked="{!dataItem.selected}" onchange="{!c.itemChange}"/>
+                                        </aura:if>
+                                    </div>
+                                </div>
+                            </aura:if>
+                        </div>
+
+                        <!-- test deploy data -->
+                        <div class="slds-col slds-p-top_x-small slds-p-right_x-small slds-size_5-of-12">
+                            <aura:if isTrue="{!dataItem.checkonly}">
+                                <div class="slds-clearfix">
+                                    <div class="slds-float_right">
+                                        <aura:if isTrue="{!(dataItem.checkonlyStatus == 'finished')}">
+                                            <lightning:icon iconName="utility:success" alternativeText="Success!" variant="Success" title="{!'Validation Succeeded on ' + dataItem.checkonlyDate}" size="x-small" />
+                                            <aura:set attribute="else">
+                                                <lightning:icon iconName="utility:error" alternativeText="Error!" variant="error" title="{!'Validation Faield on ' + dataItem.checkonlyDate}" size="x-small" />
+                                            </aura:set>
+                                        </aura:if>
+                                    </div>
+                                </div>
+                            </aura:if>
+                        </div>
+
+                        <!-- data -->
+                        <div class="slds-col slds-p-top_x-small slds-p-bottom_x-small slds-border_top slds-size_3-of-12">
+                            <div class="{!item.colorClass  + ' slds-truncate'}" title="{!dataItem.orgName}">{!dataItem.orgName}</div>
+                        </div>
+                        <div class="slds-col slds-p-top_x-small slds-p-bottom_x-small slds-border_top slds-size_1-of-12">
+                            <div class="{!item.colorClass + ' slds-truncate'}" title="{!dataItem.CreatedDate}">{!if(dataItem.CreatedDate == 0, 'N/A', dataItem.CreatedDate)}</div>
+                        </div> 
+                        <div class="slds-col slds-p-top_x-small slds-p-bottom_x-small slds-border_top slds-size_1-of-12">
+                            <div class="{!item.colorClass + ' slds-truncate'}" title="">{!if(dataItem.lastSuccess == 0,'N/A',dataItem.lastSuccess)}</div>
+                        </div> 
+                        <div class="slds-col slds-p-top_x-small slds-p-bottom_x-small slds-border_top slds-size_1-of-12">
+                            <div class="{!item.colorClass + ' slds-truncate'}" title="">{!if(dataItem.lastFailure == 0,'N/A',dataItem.lastFailure)}</div>
+                        </div> 
+                        <div class="slds-col slds-p-top_x-small slds-p-bottom_x-small slds-border_top slds-size_1-of-12">
+                            <div class="{!item.colorClass + ' slds-truncate'}" title="">{!if(dataItem.duration == 0,'N/A',dataItem.duration)}</div>
+                        </div>
+
+                        <!-- actions buttons -->
+                        <div class="slds-col slds-p-top_x-small slds-p-bottom_x-small slds-border_top slds-size_4-of-12">
+                            <lightning:buttonMenu disabled="{!and(not(dataItem.authorized), or(dataItem.lastFailure == 0, dataItem.lastSuccess == 0))}" alternativeText="Show menu" iconName="utility:list" iconSize="small" menuAlignment="right" class="slds-button_last" onselect="{! c.handleMenuSelect }">
+                                <aura:if isTrue="{!dataItem.authorized}">
+                                    <lightning:menuItem class="dropdown_button" label="Open in browser" value="{!dataItem.orgId + '/openInBrowser'}" />
+                                </aura:if>
+                                <aura:if isTrue="{!or(dataItem.lastFailure != 0, dataItem.lastSuccess != 0)}">
+                                    <lightning:menuItem class="dropdown_button" label="Show history" value="{!dataItem.orgId + '/showHistory'}" />
+                                </aura:if>
+                            </lightning:buttonMenu>
+                        </div>
+                    </aura:if>
+
+                </aura:iteration>
+            </aura:iteration>
+        </div>
+    </div>
+
+    <!-- Modal Deploy -->
+    <aura:if isTrue="{!v.isModalOpen}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeModal }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Run {!if(v.isValidateMode == true, 'validation', 'deploy')}</h2>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-text-heading_medium">
+                        {!v.deployDataText}
+                    </div>
+                </div>
+                <!--Modal/Popup Box Footer Starts here-->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeModal }"/>
+                    <lightning:button variant="brand"
+                                      label="{!'Yes, I need to ' + if(v.isValidateMode == true, 'validate', 'deploy')}"
+                                      title="{!'Yes, I need to ' + if(v.isValidateMode == true, 'validate', 'deploy')}"
+                                      onclick="{!c.deployToOrgs}"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+</aura:component>

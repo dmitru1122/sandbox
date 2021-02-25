@@ -1,0 +1,218 @@
+<apex:page sidebar="false" showHeader="false" standardStylesheets="false" standardController="Opportunity" docType="html-5.0" applyHtmlTag="false" renderAs="PDF">
+<head>
+<apex:includeScript value="{!URLFOR($Resource.RadEx__BootstrapBS,'js/bootstrap.min.js')}" />
+<apex:stylesheet value="{!URLFOR($Resource.RadEx__BootstrapBS,'css/bootstrap.min.css')}" />
+<style>     
+    @page {
+
+        @bottom-left {
+            content: "Page " counter(page) " of " counter(pages);
+        }
+    }
+    
+    .body {
+        font-family: sans-serif;
+        font-size: 13px;
+        margin: 25px 25px 25px 25px;
+    }
+    hr {
+        /*width: 98%;
+        size:300;
+        background-color: #dc6226;
+        color: #dc6226;
+        border-color: #dc6226;
+        border: 0;
+        border-top: 1px solid #dc6226;
+        height: 0px;*/
+    }
+    .section-header {
+        font-size: 18px;
+        color: #ff7302;
+        width: 100%;
+        margin: 0 auto;
+        text-align: center;
+    }
+    
+    .subsection-header {
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+
+    .tableClass {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        page-break-inside: avoid;
+        page-break-before: auto;
+    }
+    .tableClass td {
+        border: solid 1px #dc6226; 
+        border-collapse: collapse;
+        border-spacing: 0;
+        padding: 5px;
+        page-break-inside: avoid;
+        page-break-before: auto;
+    }
+    .tableClass tr {
+        page-break-inside: avoid;
+        page-break-before: auto;
+    }
+    
+    .table-cell {
+        border-color: #dc6226;
+        border: 1px;  
+    }
+
+    .table-cell-right {
+        text-align: right;
+    }
+    .table-cell-center {
+        text-align: center;
+    }
+    
+    .table-header {
+        background-color: #dc6226;
+        color: white;
+        text-align: center;
+        padding: 5px;
+        page-break-inside: avoid;
+        page-break-before: auto;
+    }
+    .table-footer {
+        font-weight: bold;
+    }
+    .table-column-service {
+        color: #ff7302;
+        font-size: 14px;
+        border: 1px #dc6226; 
+        font-weight: bold;       
+    }
+    .banner {    
+        background: url('{!$Resource.Compliatric_Logo_OrderForm}');    
+        background-repeat: no-repeat;
+        min-height: 75px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;
+    }
+    .company-info {
+        font-size: 13px;
+    }
+    .header {
+        text-align: center;
+    }
+    .header2{
+        text-align: center;
+        font-weight: bold;
+    }
+</style>
+</head>
+<apex:form >
+<div class="body">
+<div class="banner"></div>
+<p class="header">1600 West 2200 South  #101<br/>
+Salt Lake City, UT 84119<br/>
+888-878-8897</p>
+<p class="header2">Recurring Payment Authorization Form</p>
+<p>Per the agreement, your payment is to be automatically deducted from your bank account, or charged to your Visa, MasterCard, American Express or Discover Card.  Just complete and sign this form for proper enrollment.
+<br/><br/>
+You will be charged the amount indicated below each billing period.  A receipt for each payment will be emailed to you and the charge will appear on your bank statement for easy reconciliation.  You agree that no prior-notification will be provided unless the date or amount changes, in which case you will receive notice from us at least 10 days prior to the payment being collected.
+</p>
+<hr/>
+<b>Please complete the information below:</b>
+<p>
+I ___________________________________ (name) authorize Compliatric to charge my credit card or draw funds from the checking account indicated below for &nbsp;<b><apex:outputField value="{!Opportunity.Total_Monthly_Recurring_Costs__c}" /></b> on the 4th Day of each Month, 
+commencing October 4, 2018, for payment of my Compliance Services Plan. I also authorize Compliatric to take an Initial Payment in the amount of &nbsp;<b><apex:outputField value="{!Opportunity.Setup_Fee__c}" /></b> which represents the one-time implementation fee plus the first month of service.
+</p>
+<table styke="width:100%;">
+    <tr>
+        <td>Billing Address ____________________________</td>
+        <td>City, State, Zip   ___________________________</td>
+    </tr> 
+    <tr>
+        <td>Phone# __________________________________</td>
+        <td>Email  ___________________________________</td>
+    </tr>                 
+</table>
+
+<br/>
+
+<div>
+
+<table style="display: inline-block; border-style:solid; border-width:1px;">
+    <tr>
+        <td><apex:inputCheckbox label="Checking" value="{!Opportunity.Name}" /></td>
+        <td>Savings</td>
+    </tr>
+    <tr>
+        <td>Name on Acct </td>
+        <td>______________________</td>
+    </tr>
+    <tr>
+        <td>Bank Name </td>
+        <td>______________________</td>
+    </tr>
+    <tr>
+        <td>Account Number</td>
+        <td>______________________</td>
+    </tr>
+    <tr>
+        <td>Bank Routing #</td>
+        <td>______________________</td>
+    </tr>
+    <tr>
+        <td>Bank City/State</td>
+        <td>______________________</td>
+    </tr>
+    <tr colspan="2">
+        <td></td>
+    </tr>
+</table>
+
+<table style="float: right; border-style:solid; border-width:1px;">
+    <tr>
+        <td>Visa</td>
+        <td>MasterCard</td>
+    </tr>
+    <tr>
+        <td>Amex</td>
+        <td>Discover</td>
+    </tr>
+    <tr>
+        <td>Cardholder Name</td>
+        <td>______________________________</td>
+    </tr>
+    <tr>
+        <td>Account Number</td>
+        <td>__________________________</td>
+    </tr>
+    <tr>
+        <td>Exp. Date</td>
+        <td>_____________</td>
+    </tr>
+</table>
+</div>
+<br/>
+<p>
+SIGNATURE  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                           DATE                 
+</p><br/>
+<p style="font-size:9px; color:#808080;">I understand that this authorization will remain in effect for the duration of the agreement, cancellation of which must be  in writing.   
+I agree to notify Compliatric in writing of any changes in my account information or termination of this authorization at least 15 days prior to the next billing date. 
+Termination of this authorization must be accompanied with another authorization or full settlement payment for the remainder of the agreement.  
+If the above noted payment dates fall on a weekend or holiday, I understand that the payments may be executed on the next business day. 
+Initial payments of services may be on a different date to accommodate account set-up, etc. For ACH debits to my checking/savings account, 
+I understand that because these are electronic transactions, these funds may be withdrawn from my account as soon as the above noted periodic transaction dates. 
+In the case of an ACH Transaction being rejected for Non Sufficient Funds (NSF) I understand that Compliatric may at its discretion attempt to process the charge 
+again within 30 days, and agree to an additional $30 charge for each attempt returned NSF which will be initiated as a separate transaction from the authorized 
+recurring payment. I acknowledge that the origination of ACH transactions to my account must comply with the provisions of U.S. law.  
+I certify that I am an authorized user of this credit card/bank account and will not dispute these scheduled transactions with my bank or credit card company;
+ so long as the transactions correspond to the terms indicated in this authorization form or approved change orders.</p>
+
+
+</div>
+</apex:form>
+</apex:page>

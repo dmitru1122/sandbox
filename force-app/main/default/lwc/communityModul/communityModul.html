@@ -1,0 +1,135 @@
+<template>
+
+	<div class="slds-box slds-theme_default">
+	<div class="button-back" if:true={showBackButton}>
+		<lightning-button variant="brand" label="Back" title="Back" onclick={handleClickBack} class="slds-m-left_x-small"></lightning-button>
+	</div>
+
+
+	<template if:true={MainPageStep}>
+		<template if:true={recordModuls}>
+			<div class="module-block-wrapper">
+			<template for:each={recordModuls} for:item="modul" >
+				<div key={modul.modul.Id} class="module-wrapper-item" onclick={openModuleRecord} onmouseleave={handleMouseLeave}
+					 onmousemove={handleMouseEnter} data-id={modul.modul.Id} data-name={modul.modul.Name}>
+
+					<template if:true={modul.modulImg}>
+						<img src={modul.modulImg} width="60" height="60" style="margin-left: auto;margin-right: auto;"/>
+					</template>
+					<template if:false={modul.modulImg}>
+						<lightning-icon icon-name="utility:connected_apps" alternative-text="Connected" title="Connected" class="module-icon">
+						</lightning-icon>
+					</template>
+
+					<template if:true={ReleaseNoteNotEmpty}>
+						<div data-type="divReleaseNote"
+							 class="slds-popover slds-nubbin_top-left slds-hide  slds-popover_tooltip tooltiptext"
+							 role="tooltip" aria-live="polite" style={cssTooltipStyle}>
+							<div class="slds-popover__body ms-help-popup-body">
+								<template for:each={recordModuleReleaseNotes} for:item="moduleRelease">
+									<div key={moduleRelease.packageVersion.id}>
+										<div class="slds-popover__body">
+											<p>{moduleRelease.packageVersion.Release_Date__c} - {moduleRelease.packageVersion.Name}</p>
+											<template for:each={moduleRelease.productDevelopmentWrappers} for:item="release">
+												<div key={release.recordTypeName}>
+													<ul class="slds-is-nested">
+														<li class="recordType-name">{release.recordTypeName}</li>
+														<ul class="slds-is-nested slds-list_dotted">
+															<template for:each={release.productDevelopments} for:item="productDevelopment">
+																<div key={productDevelopment.Id}>
+																	<li><p><span class="releaseNote-subject">{productDevelopment.Release_Note_Subject__c} </span> - {productDevelopment.Release_Note__c}</p></li>
+																</div>
+															</template>
+														</ul>
+													</ul>
+												</div>
+											</template>
+										</div>
+									</div>
+								</template>
+							</div>
+						</div>
+					</template>
+
+					<div class="module-name" >{modul.modul.Name}</div>
+
+				</div>
+			</template>
+			</div>
+		</template>
+	</template>
+
+	<template if:true={ListDocumentStep}>
+
+		<div class="module-title">{ModullName}</div>
+		<template if:false={ModuleDocumentNotEmpty}>
+			<div class="no-document"><h1>No Documents Founds</h1>  </div>
+		</template>
+
+		<div class="slds-grid slds-wrap">
+
+			<div class={tabClass}>
+				<div class="list-document">
+					<template for:each={openModul} for:item="modulDocument" >
+						<div key={modulDocument.Id} class="document-block" >
+							<div class="document-name" onclick={openDocument}  data-id={modulDocument.Id}>
+								<lightning-icon icon-name="utility:answer" alternative-text="Connected" title="Connected" class="module-icon-custom" ></lightning-icon>
+								{modulDocument.Name}  -  {modulDocument.Documentation_Type__c}    </div>
+							<div class="document-description" > {modulDocument.Document_Summary__c} </div>
+							<hr class="hr-item"></hr>
+						</div>
+					</template>
+				</div>
+			</div>
+
+			<template if:true={OpenModuleReleaseNoteNotEmpty}>
+			<div class="slds-size_1-of-2">
+				<div class="releaseNote-title">Release Notes:</div>
+				<template for:each={openModuleReleaseNotes} for:item="moduleRelease">
+					<div key={moduleRelease.packageVersion.Id}>
+						<p class="releaseNote-version">{moduleRelease.packageVersion.Release_Date__c} - {moduleRelease.packageVersion.Name}</p>
+						<template for:each={moduleRelease.productDevelopmentWrappers} for:item="release">
+							<div key={release.recordTypeName}>
+								<ul class="slds-is-nested">
+									<ul class="slds-is-nested slds-list_dotted">
+										<template for:each={release.productDevelopments} for:item="productDevelopment">
+											<div key={productDevelopment.Id}>
+												<li><p><span class="releaseNote-subject">{productDevelopment.Release_Note_Subject__c} </span> - {productDevelopment.Release_Note__c}</p></li>
+											</div>
+										</template>
+									</ul>
+								</ul>
+							</div>
+						</template>
+					</div>
+				</template>
+			</div>
+			</template>
+		</div>
+
+	</template>
+
+	<template if:true={DocumentStep}>
+		<div class="module-title">{ModullName} </div>
+		<div class="document-block" >
+		<div class="document-name" >
+			<lightning-icon icon-name="utility:answer" alternative-text="Connected" title="Connected" class="module-icon-custom" ></lightning-icon>
+			{openedDocument.Name}  -  {openedDocument.Documentation_Type__c} 
+		 </div>
+		<div class="document-description" > {openedDocument.Document_Summary__c} </div>
+		<template if:true={openedDocument.Published_URL__c}> 
+			---r   {openedDocument.Published_URL__c} --- yyy
+			<template  if:false={isOpenVideo}>
+				rrrr
+				<iframe class="frame-item" src={openedDocument.Published_URL__c} width="100%" height="1500px" frameborder="0" allowfullscreen="true"></iframe>
+			</template>
+			<template if:true={isOpenVideo}>
+				show vidoe 
+				<iframe class="frame-item" src={openedDocument.Published_URL__c} width="100%" height="1500px" frameborder="0" allowfullscreen="true"></iframe>
+			</template>
+
+		</template>
+		</div>
+	</template>
+</div>
+</template>

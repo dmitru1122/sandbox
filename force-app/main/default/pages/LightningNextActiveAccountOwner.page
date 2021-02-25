@@ -1,0 +1,5 @@
+<apex:page controller="NextActiveAccountOwnerController" action="{!redirectAction}">
+	<apex:form id="theForm">
+		<apex:pageMessages id="msg"/>
+	</apex:form>
+</apex:page>

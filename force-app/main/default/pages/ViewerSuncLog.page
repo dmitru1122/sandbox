@@ -1,0 +1,17 @@
+<apex:page standardController="Account" >
+
+	<style>
+		a.btnCourseStatus:hover {
+			text-decoration:none; 
+		}
+	</style>
+	
+	<div style="margin-top: 10px;margin-bottom: 10px;margin-left: 20px;">
+		<apex:outputLink styleClass="btn btnCourseStatus"  target="_blank" value="{!$Page.ViewerSuncLogExtention}?id={!Account.Id}"  >
+			Interact
+		</apex:outputLink>
+	</div>
+	
+
+	<c:ViewerSuncLogComponent id="componentSyncLog" accountId="{!Account.Id}" ExtensionMode="false" />
+</apex:page>

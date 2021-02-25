@@ -1,0 +1,33 @@
+<apex:page controller="PartnerOrderSummaryController" showHeader="false" >
+
+
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"/>
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"/>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" type="text/css" media="all" />
+    <apex:includeScript value="{!URLFOR($Resource.tablesorter, '/tablesorter-master/jquery.tablesorter.js')}"/>
+
+    <script type="text/javascript">
+        $j = jQuery.noConflict();    
+        $j(document).ready(function () {
+        $j("[id$=theaddrs]").tablesorter();
+        });    
+    </script>
+
+<apex:pageBlock title="Provisioned SF Licenses (Sortable)" id="theaddrsblock">
+    <apex:pageBlockTable value="{!PartnersOrderSummary}" var="agg" id="theaddrs">
+        <apex:column headerValue="Customer Name">           
+            <apex:outputLink value="/{!agg.CompanyId}" target="_parent">{!agg.CompanyName}</apex:outputLink>
+        </apex:column>
+        <apex:column headerValue="Service Renewal">
+            <apex:outputText value="{0,date,yyyy'-'MM'-'dd}">
+                <apex:param value="{!agg.ServiceRenewalDate}" />
+            </apex:outputText>
+        </apex:column>
+        <apex:column headerValue="Power Licenses" value="{!agg.TotalPower}" />
+        <apex:column headerValue="Basic Licenses" value="{!agg.TotalBasic}" />
+        <apex:column headerValue="Admin Licenses" value="{!agg.TotalAdmin}" />
+        <apex:column headerValue="Partner Admin Licenses" value="{!agg.TotalPartnerAdmin}" />
+        <apex:column headerValue="Total Licenses" value="{!agg.TotalLicenses}" />
+    </apex:pageBlockTable>
+</apex:pageBlock>
+</apex:page>

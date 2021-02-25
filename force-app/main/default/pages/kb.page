@@ -1,0 +1,12 @@
+<apex:page standardController="Knowledge__kav" showChat="false" showHeader="false" sidebar="false">
+
+<apex:pageBlock >
+
+    <apex:outputField value="{!Knowledge__kav.Title}"/><br />  
+    <apex:outputField value="{!Knowledge__kav.articleNumber}"/> 
+    <br />
+    <br />
+<apex:outputField rendered="{!IF(ISBLANK(Knowledge__kav.External_URL__c),true,false)}" value="{!Knowledge__kav.body__c}" />
+<apex:iframe rendered="{!IF(ISBLANK(Knowledge__kav.External_URL__c),false,true)}" src="{!Knowledge__kav.External_URL__c}" width="800" height="600" scrolling="true" />
+</apex:pageBlock>
+</apex:page>

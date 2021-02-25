@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>33.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>Site template for use with Linvio PaymentConnect and Quotes &amp; Invoices packages</description>
+    <label>SiteTemplate_Compliatric</label>
+    <packageVersions>
+        <majorNumber>5</majorNumber>
+        <minorNumber>136</minorNumber>
+        <namespace>pymt</namespace>
+    </packageVersions>
+    <packageVersions>
+        <majorNumber>1</majorNumber>
+        <minorNumber>67</minorNumber>
+        <namespace>quot</namespace>
+    </packageVersions>
+</ApexPage>

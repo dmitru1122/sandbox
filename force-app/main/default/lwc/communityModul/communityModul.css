@@ -1,0 +1,143 @@
+.module-block-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	width: 60%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.module-wrapper-item {
+	width: 200px;
+	height: 150px;
+	margin: 4px;
+	padding: 5px;
+	border-radius: 4px;
+	background-color: #F47321;
+	display: flex;
+	flex-direction:column;
+	justify-content: space-evenly; 
+	cursor: pointer;
+	font-weight: bold;
+	color: white;
+	padding: 8px;
+}
+
+
+.module-wrapper-item:hover {
+	/* font-size: 1.1rem; */
+	/* padding: 0px; */
+	color:grey;
+	
+} 
+
+.module-icon {
+	text-align: center;
+}
+
+.module-icon-custom {
+	margin-right: 10px;
+}
+
+.module-name {
+	text-align: center;
+	font-family: 'Salesforce Sans',Arial,sans-serif;
+}
+
+.document-block {
+	padding: 15px;
+	margin: 5px;
+	/* float: left; */
+	font-family: 'Salesforce Sans',Arial,sans-serif;
+}
+
+.no-document {
+	padding-top: 20px;
+	text-align: center;
+	color: #F47321;
+	font-family: 'Salesforce Sans',Arial,sans-serif;
+}
+
+.module-title {
+	text-align: center;
+	font-size: 1.5rem;
+	font-family: 'Salesforce Sans',Arial,sans-serif;
+	font-weight: bold;
+}
+
+.document-title {
+	text-align: center;
+	font-size: 1.5rem;
+	
+}
+
+.hr-item {
+	/* max-width: 50%; */
+}
+
+.document-name {
+	padding-bottom: 10px;;
+	cursor: pointer;
+	text-align: left;
+	text-decoration: underline;  
+	font-size: 1.2rem;
+	color:#F47321;
+	font-weight: bold;
+}
+
+.document-description {
+	/* max-width: 50%; */
+}
+
+.button-back {
+	padding-top: 10px;
+	padding-right: 10px;
+	/* float: left; */
+}
+
+.frame-item {
+	display:block;
+	padding-top: 10px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.list-document {
+	display: flex;
+	flex-direction:column;
+	font-family: 'Salesforce Sans',Arial,sans-serif;
+}
+
+.tooltiptext {
+	width:auto;
+	height:auto;
+	text-align: left;
+	font-weight: normal;
+
+	--sds-c-tooltip-sizing-max-width:30rm;
+	--sds-c-tooltip-text-color:black;
+	--sds-c-tooltip-color-background:white;
+
+	position: absolute;
+}
+
+.recordType-name {
+	text-align: left;
+	font-size: 0.8rem;
+	color:#F47321;
+	font-weight: bold;
+}
+
+.releaseNote-version, .releaseNote-title {
+	padding-top: 10px;
+	text-align: left;
+	font-size: 1rem;
+	color: black;
+}
+
+.releaseNote-subject{
+	text-align: left;
+	font-size: 0.8rem;
+	color: black;
+	font-weight: bold;
+}

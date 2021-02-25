@@ -1,0 +1,3 @@
+<apex:page controller="KnowledgeArticleViewer">
+  <iframe src="{!LatestKnowledgeArticle}" style="min-height: 500px;" autoscroll="true" width="100%" height="100%" />
+</apex:page>

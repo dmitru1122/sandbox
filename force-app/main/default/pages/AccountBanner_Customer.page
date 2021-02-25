@@ -1,0 +1,10 @@
+<apex:page standardController="Account" showHeader="false" sidebar="false">
+<apex:stylesheet value="{!URLFOR($Resource.RadEx__Default, 'Default.css')}"/>
+<div class="compliatric-container">
+<div class="summary-header">
+    <h2>
+        <apex:outputText value="{!Account.Name & " - " & Account.Owner.Name}" /><apex:outputText rendered="{!IF(Account.Estimated_Site_Visit_Date_formula__c != null && Account.Estimated_Site_Visit_Date_formula__c-TODAY() < 365 && Account.Estimated_Site_Visit_Date_formula__c > TODAY(),true,false)}" value=" - OSV Alert Site Visit Date: " /> <apex:outputField rendered="{!IF(Account.Estimated_Site_Visit_Date_formula__c != null && Account.Estimated_Site_Visit_Date_formula__c-TODAY() < 365 && Account.Estimated_Site_Visit_Date_formula__c > TODAY(),true,false)}" value="{!Account.Estimated_Site_Visit_Date_formula__c}" />
+    </h2>
+</div>
+</div>
+</apex:page>

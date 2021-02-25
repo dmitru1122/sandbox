@@ -1,0 +1,4 @@
+<apex:page lightningStylesheets="true" standardController="User" >
+<apex:slds />
+  <h2>Renewal Date</h2> <apex:outputField value="{!User.Renewal_Date__c}" />
+</apex:page>

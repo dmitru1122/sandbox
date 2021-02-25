@@ -1,0 +1,291 @@
+<apex:page sidebar="false" showHeader="false" standardStylesheets="false" standardController="Opportunity" extensions="CompliatricOrderFormExtension" docType="html-5.0" applyHtmlTag="false" renderAs="pdf" >
+<apex:messages />
+<head>
+<style>     
+    @page {
+
+        @bottom-left {
+            content: "Page " counter(page) " of " counter(pages);
+        }
+    }
+    
+    .body {
+        font-family: sans-serif;
+        font-size: 13px;
+        margin: 25px 25px 25px 25px;
+    }
+    hr {
+        width: 98%;
+    }
+    hr {
+        background-color: #dc6226;
+        color: #dc6226;
+        border-color: #dc6226;
+        border: 0;
+        border-top: 1px solid #dc6226;
+        height: 0px;
+    }
+    .section-header {
+        font-size: 18px;
+        color: #ff7302;
+        width: 100%;
+        margin: 0 auto;
+        text-align: center;
+    }
+    
+    .subsection-header {
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+
+    .tableClass {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        page-break-inside: avoid;
+        page-break-before: auto;
+    }
+    .tableClass td {
+        border: solid 1px #dc6226; 
+        border-collapse: collapse;
+        border-spacing: 0;
+        padding: 5px;
+        page-break-inside: avoid;
+        page-break-before: auto;
+    }
+    .tableClass tr {
+        page-break-inside: avoid;
+        page-break-before: auto;
+    }
+    
+    .table-cell {
+        border-color: #dc6226;
+        border: 1px;  
+    }
+
+    .table-cell-right {
+        text-align: right;
+    }
+    .table-cell-center {
+        text-align: center;
+    }
+    
+    .table-header {
+        background-color: #dc6226;
+        color: white;
+        text-align: center;
+        padding: 5px;
+        page-break-inside: avoid;
+        page-break-before: auto;
+    }
+    .table-footer {
+        font-weight: bold;
+    }
+    .table-column-service {
+        color: #ff7302;
+        font-size: 14px;
+        border: 1px #dc6226; 
+        font-weight: bold;       
+    }
+    .banner {    
+        background: url('{!$Resource.Compliatric_Logo_OrderForm}');    
+        background-repeat: no-repeat;
+        min-height: 75px;
+    }
+    .company-info {
+        font-size: 13px;
+    }
+</style>
+</head>
+<div class="body">
+<div class="banner"></div>
+<hr />
+<p class="section-header">PURCHASE ORDER</p>
+<hr />
+
+<p>This agreement is for {!Opportunity.Account.Name} (Client) and Compliatric, dated <apex:outputText value="{0,date, MMMM' 'dd,' 'yyyy}">
+    <apex:param value="{!Opportunity.CreatedDate}" /> 
+</apex:outputText>.</p>
+
+<p class="subsection-header">Company Information:</p>
+
+<table width="100%" class="company-info">
+    <tr>
+        <th>Company Name: <span style="font-weight:normal;">{!Opportunity.Account.Name}</span></th>
+        <th>Customer Billing: </th>
+    </tr>
+    <tr>
+        <th>Billing Contact Name: <span style="font-weight:normal;">{!Opportunity.Billing_Contact__r.Name}</span></th>
+        <th style="font-weight:normal;">{!Opportunity.Account.Name}</th>
+    </tr>
+    <tr>
+        <th>Email: <span style="font-weight:normal;">{!Opportunity.Billing_Contact__r.Email}</span></th>
+        <th style="font-weight:normal;">{!Opportunity.Account.BillingStreet}</th>
+    </tr>
+    <tr>
+        <th>Telephone: <span style="font-weight:normal;">{!Opportunity.Billing_Contact__r.Phone}</span></th>
+        <th style="font-weight:normal;">{!Opportunity.Account.BillingCity}, {!Opportunity.Account.BillingState} {!Opportunity.Account.BillingPostalCode}</th>
+    </tr>
+</table>    
+
+<p class="subsection-header">Service Description</p>
+<p>{!Opportunity.Account.Name} will be provided with the Compliatric technology described below.</p>
+
+<hr/>
+
+<p class="subsection-header">Terms &amp; Billing</p>
+
+<table width="100%">
+    <tr>
+        <th>Effective Date: <apex:outputText style="font-weight:normal;" value="{0,date, MMMM' 'dd,' 'yyyy}"><apex:param value="{!Opportunity.Effective_Order_Form_Date__c}" /></apex:outputText></th>
+        <th>Payment Method: <span style="font-weight:normal;">{!Opportunity.Payment_Method__c}</span></th>
+    </tr>
+    <tr>
+        <th>Initial Term End Date: <apex:outputText style="font-weight:normal;" value="{0,date, MMMM' 'dd,' 'yyyy}"><apex:param value="{!Opportunity.Initial_Term_End_Date__c}" /></apex:outputText></th>
+        <th>Payment Terms: <span style="font-weight:normal;">{!Opportunity.Payment_Terms__c}</span></th>
+    </tr>
+    <tr>
+        <th>Billing Method: <span style="font-weight:normal;">{!Opportunity.Billing_Method__c}</span></th>
+        <th>Billing Period / Frequency: <span style="font-weight:normal;">{!Opportunity.Billing_Period_Frequency__c}</span></th>
+    </tr>
+    <tr style="{!IF(Opportunity.PO_Required__c == false,'display: none;','')}">
+        <th>PO Required: <span style="font-weight:normal;">{!Opportunity.PO_Required__c}</span></th>
+        <th>PO Number: <span style="font-weight:normal;">{!Opportunity.pymt__PO_Number__c}</span></th>
+    </tr>
+</table>
+<br />
+<hr/>
+
+<p class="subsection-header">Payment Terms:</p>
+
+<ul>
+    <li>Subscription fee payments are due on the same date each period and coincide with the effective date of the agreement.</li>
+    <li>Monthly subscription fees are paid via ACH or Credit Card draw.</li>
+    <li>Invoice for additional services have Net 15 terms.</li>
+    <li>We require receipt of the initial payment prior to provisioning the application and allocating professional service resources.</li>
+    <apex:outputText rendered="{!ISBLANK(Opportunity.Payment_Terms_Description__c)}" value="{!Opportunity.Payment_Terms_Description__c}" escape="false"></apex:outputText>
+</ul>
+
+
+
+<div style="page-break-after:always;"> </div>
+
+<!-- PAGE 2 SCHEDULE DETAILS ***************** -->
+<div class="banner"></div>
+<hr />
+<p class="section-header">PURCHASE ORDER SCHEDULE</p>
+<hr />
+<br/>
+
+<!--for products use value="{!Opportunity.OpportunityLineItem}" var="c"-->
+
+<table class="tableClass" >
+<tr class="table-header">
+    <td>
+        Service
+    </td>
+    <td>
+        Description
+    </td>
+    <td>
+        Qty
+    </td>
+    <!--<td>
+        $
+    </td>
+    <td>
+        Monthly Recurring $
+    </td>-->
+</tr>
+    <apex:repeat value="{!LineItems}" var="c">
+    <tr>        
+        <td width="25%" class="table-cell table-column-service"><apex:outputText value="{!Substitute(c.Name,c.Opportunity.Name,"")}" /></td>
+        <td width="45%" class="table-cell"><apex:outputField value="{!c.Product2.Invoice_Description__c}" /></td>
+        <td width="10%" class="table-cell table-cell-center"><apex:outputField value="{!c.Invoice_Quantity__c}" /></td>
+        <!--<td width="10%" class="table-cell table-cell-center"><apex:outputField value="{!c.UnitPrice}" /></td>
+        <td width="10%" class="table-cell table-cell-right"><apex:outputField value="{!c.Recurring_Costs__c}" /></td>-->
+    </tr>    
+    </apex:repeat>
+    <!--<tr class="table-footer">
+        <td colspan="3" class="table-cell-right">Total Monthly Recurring Costs</td>
+        <td>&nbsp;</td>
+        <td class="table-cell-right"><apex:outputField value="{!Opportunity.Total_Monthly_Recurring_Costs__c}" /></td>
+    </tr>-->
+</table>
+<!--
+<apex:dataTable width="100%" value="{!Opportunity.OpportunityLineItems}" var="c" id="theTable" styleClass="tableClass">
+
+    <apex:column headerValue="Service" width="20%" styleClass="table-cell table-column-service">
+        <apex:outputText value="{!Substitute(c.Name,c.Opportunity.Name,"")}"/>
+    </apex:column>
+    <apex:column headerValue="Description" width="30%" styleClass="table-cell">
+        <apex:outputText value="{!c.Invoice_Description__c}"/>
+    </apex:column>
+    <apex:column headerValue="Qty" width="10%" styleClass="table-cell table-cell-center">
+        <apex:outputText value="{!c.Quantity}"/>
+    </apex:column>
+    <apex:column headerValue="$" width="10%" styleClass="table-cell table-cell-center">
+        <apex:outputText value="${!c.Unitprice}"/>
+    </apex:column>
+    <apex:column headerValue="Monthly Recurring $" width="10%" styleClass="table-cell table-cell-right">
+        <apex:outputText value="${!c.Subtotal}" />        
+    </apex:column>
+</apex:dataTable>
+-->    
+
+<!--<p><b>Total due at order signing to get started:&nbsp; <apex:outputField value="{!Opportunity.Setup_Fee__c}" /> + &nbsp;<apex:outputField value="{!Opportunity.Total_Monthly_Recurring_Costs__c}" /> (1st Month) =&nbsp; <apex:outputField value="{!Opportunity.Total_Order_Form_Price__c}" /></b></p>
+<p><b>Recurring Monthly Payment Terms:&nbsp; <apex:outputField value="{!Opportunity.Total_Monthly_Recurring_Costs__c}" /></b></p>-->
+
+<p style="font-size:13px; font:Candara;">BY EXECUTING THIS ORDER FORM, YOU AGREE TO OUR MSA AVAILABLE ONLINE AT THE FOLLOWING URL <a href="http://www.compliatric.com/agreements/JidokaMSA.pdf">http://www.compliatric.com/agreements/JidokaMSA.pdf</a>. IF YOU ARE ENTERING INTO THIS AGREEMENT ON BEHALF OF A COMPANY OR OTHER LEGAL ENTITY, YOU REPRESENT THAT YOU HAVE THE AUTHORITY TO BIND SUCH ENTITY AND ITS AFFILIATES TO THESE TERMS AND CONDITIONS, IN WHICH CASE THE TERMS "YOU" OR "YOUR" SHALL REFER TO SUCH ENTITY AND ITS AFFILIATES. IF YOU DO NOT HAVE SUCH AUTHORITY, OR IF YOU DO NOT AGREE WITH THESE TERMS AND CONDITIONS, YOU MUST NOT ACCEPT THIS AGREEMENT AND MAY NOT USE THE SERVICES.</p>
+
+<apex:outputText value="{!Opportunity.Order_Form_Custom_Text__c}" rendered="{!IF(ISBLANK(Opportunity.Order_Form_Custom_Text__c),true,false)}" escape="false"></apex:outputText>
+
+<hr/>
+<center><p><i>Remainder of this page intentionally left blank</i></p></center>
+
+<div style="page-break-after:always;"> </div>
+
+<!-- PAGE 3 ESIG DETAILS ***************** -->
+<div class="banner"></div>
+
+<table width="100%">
+    <tr>
+        <th>Compliatric Signature</th>
+        <th>Client Signature</th>
+    </tr>
+    <tr>
+        <th colspan="2">&nbsp;</th>
+    </tr>
+    <tr>
+        <td style="width: 50%"><apex:outputText value="[dvSignature_1]" style="font-size: x-small;"></apex:outputText><hr style="width: 100%;" /><b>Signature</b></td>
+        <td style="width: 50%"><apex:outputText value="[dvSignature_2]" style="font-size: x-small;"></apex:outputText><hr style="width: 100%;"/><b>Signature</b></td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td><apex:outputText value="[dvName_1]" style="font-size: x-small;"></apex:outputText><hr style="width: 100%;"/><b>Print Name</b></td>
+        <td><apex:outputText value="[dvName_2]" style="font-size: x-small;"></apex:outputText><hr style="width: 100%;"/><b>Print Name</b></td>
+    </tr>
+    <tr>
+        <th colspan="2">&nbsp;</th>
+    </tr>
+    <tr>
+        <td><apex:outputText value="[dvTitle_1]" style="font-size: x-small;"></apex:outputText><hr style="width: 100%;"/><b>Title</b></td>
+        <td><apex:outputText value="[dvTitle_2]" style="font-size: x-small;"></apex:outputText><hr style="width: 100%;"/><b>Title</b></td>
+    </tr>
+    <tr>
+        <th colspan="2">&nbsp;</th>
+    </tr>
+    <tr>
+        <td><apex:outputText value="[dvDate_1]" style="font-size: x-small;"></apex:outputText><hr style="width: 100%;"/><b>Date</b></td>
+        <td><apex:outputText value="[dvDate_2]" style="font-size: x-small;"></apex:outputText><hr style="width: 100%;"/><b>Date</b></td>
+    </tr>
+</table>
+
+
+</div>
+
+</apex:page>

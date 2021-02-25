@@ -1,0 +1,58 @@
+<apex:page standardcontroller="Case" extensions="SetResetPwdController">
+    <apex:includescript value="{!URLFOR($Resource.migrationJS, 'js/jquery-2.1.4.min.js')}"/>
+    <apex:includescript value="{!URLFOR($Resource.migrationJS, 'js/jsforce-1.7.0.min.js')}"/>
+
+    <apex:form id="form">
+        <!--<apex:actionfunction action="{!autoAuth}" name="autoAuth" onComplete="logData();"></apex:actionfunction>-->
+
+        <h1>Reset Password</h1>
+
+        <p>OrgId: {! Case.External_Org_Id__c }</p>
+        <p>authData: {! authData }</p>
+    </apex:form>
+
+    <script type="text/javascript">
+        $( document ).ready(function () {
+            source = new Org('{! Case.External_Org_Id__c }', 'Test');
+            source.auth = JSON.parse(JSON.stringify(JSON.parse('{! authData }')).split('oAuth2').join('oauth2'));
+            
+            try {
+                var conn = new jsforce.Connection({
+                    oauth2 : {
+                        clientId : source.auth.oauth2.clientId,
+                        clientSecret : source.auth.oauth2.clientSecret,
+                        redirectUri : source.auth.oauth2.redirectUri
+                    },
+                    instanceUrl : source.auth.endPoint,
+                    accessToken : source.auth.accessKey,
+                    refreshToken : source.auth.refreshKey
+                });
+                source.conn = conn;
+            } catch (error) {
+                console.log(error);
+            }
+
+            var apexBody = "System.debug('Hello, World');";
+
+            source.conn.tooling.executeAnonymous(apexBody, function(err, res) {
+                if (err) { return console.error(err); }
+                console.log("compiled?: " + res.compiled); // compiled successfully
+                console.log("executed?: " + res.success); // executed successfully
+            });
+            
+        });
+    </script>
+    <script type="text/javascript">
+        /*
+         * Org class
+         */
+
+         var Org = function (id, name) {
+            this.id = id;
+            this.orgName = name;
+            this.auth;
+            this.errors = 'Auth error';
+            this.callback;
+        }
+    </script>
+</apex:page>

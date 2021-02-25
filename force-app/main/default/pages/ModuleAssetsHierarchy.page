@@ -1,0 +1,40 @@
+<apex:page showHeader="false" sidebar="false" standardController="Module_Assets__c" extensions="ModuleAssetsHierarchyController">
+	<apex:pageBlock >
+		
+		<apex:pageBlockTable value="{!wrappers}" var="wrap" rendered="{!hasRecords}">
+			<apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.Name.label}">
+				<div style="margin-left: {!HTMLENCODE(TEXT(wrap.Depth * 20))}px;">
+					<a href="/{!wrap.ma.Id}" target="_blank" style="font-weight: {!IF(wrap.ma.Id == currentMAId, 'bold' , 'normal')};">
+						<apex:outputField value="{!wrap.ma.Name}" />
+					</a>
+				</div>
+			</apex:column>
+			<apex:column headerValue="Type">
+				<apex:outputField value="{!wrap.ma.RecordType.Name}" />
+			</apex:column>
+			<apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.Module__c.label}">
+				<apex:outputField value="{!wrap.ma.Module__c}" />
+			</apex:column>
+			<apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.MA_Status__c.label}">
+				<apex:outputField value="{!wrap.ma.MA_Status__c}" />
+			</apex:column>
+			<apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.Module_Asset_Type__c.label}">
+				<apex:outputField value="{!wrap.ma.Module_Asset_Type__c}" />
+			</apex:column>
+			<apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.Days_Before__c.label}">
+				<apex:outputField value="{!wrap.ma.Days_Before__c}" />
+			</apex:column>
+            <apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.Notification_Type__c.label}">
+				<apex:outputField value="{!wrap.ma.Notification_Type__c}" />
+			</apex:column>
+			<apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.Client_Account__c.label}">
+				<a href="/{!wrap.ma.Client_Account__c}" target="_blank">
+					<apex:outputField value="{!wrap.ma.Client_Account__r.Name}" />
+				</a>
+			</apex:column>
+		</apex:pageBlockTable>
+		<apex:facet name="footer">
+			<apex:outputText value="{!message}" rendered="{!!hasRecords}"/>
+		</apex:facet>
+	</apex:pageBlock>
+</apex:page>

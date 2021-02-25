@@ -1,0 +1,47 @@
+<apex:page controller="ClientSpinUpController" showHeader="false" >
+
+
+<apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"/>
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"/>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" type="text/css" media="all" />
+    <apex:includeScript value="{!URLFOR($Resource.tablesorter, '/tablesorter-master/jquery.tablesorter.js')}"/>
+
+    <script type="text/javascript">
+        $j = jQuery.noConflict();    
+        $j(document).ready(function () {
+        $j("[id$=theaddrs]").tablesorter();
+        });    
+    </script>
+
+<apex:pageBlock title="Client Spin Up Status (Sortable)" id="theaddrsblock">
+    <apex:pageBlockTable value="{!ClientSpinUpSummary}" var="agg" id="theaddrs">
+        <apex:column headerValue="Org Link">           
+            <apex:outputLink value="/{!agg.Id}" target="_parent">{!agg.Name}</apex:outputLink>
+        </apex:column>
+        <!--<apex:column headerValue="Record Type" value="{!agg.RecordType.Name}" />-->
+        <apex:column headerValue="Start Up Project">
+            <apex:outputLink value="/{!agg.Startup_Project__c}" target="_parent">{!agg.Startup_Project__r.Name}</apex:outputLink>
+        </apex:column>
+        <apex:column headerValue="Owner">
+            <apex:outputLink value="/{!agg.OwnerId}" target="_parent">{!agg.Owner.Name}</apex:outputLink>
+        </apex:column>
+        <apex:column style="font-weight:800" headerValue="Project % Complete" value="{!agg.Startup_Project__r.RadEx__ProjectPerComplete__c}" />
+        <apex:column headerValue="Time Zone" value="{!agg.Time_Zone__c}" />
+        <apex:column headerValue="Desired Completion" value="{!agg.Startup_Project__r.RadEx__Desired_Completion_Date__c}" />
+        <apex:column headerValue="Estimated Completion" value="{!agg.Startup_Project__r.RadEx__Project_Estimated_Completed_Date__c}" />
+        <apex:column headerValue="Go Live" value="{!agg.Go_Live_Date_BASIC_USERS__c}" title="When does this customer go live (all basic users)?" />
+        <apex:column headerValue="LIC" value="{!agg.Lic_Ordered__c}" />
+        <apex:column headerValue="KIT" value="{!agg.Kit_Delivered__c}" />
+        <apex:column headerValue="KOC" value="{!agg.Kick_Off_Call_Completed__c}" />
+        <apex:column headerValue="Data Loaded" value="{!agg.Data_Loaded__c}" />
+        <apex:column headerValue="Test" value="{!agg.ORG_Tested__c}" />
+        <apex:column headerValue="Users Deployed" value="{!agg.Users_Deployed__c}" />
+        <apex:column headerValue="Trained" value="{!agg.Training_Complete__c}" />
+    </apex:pageBlockTable>
+</apex:pageBlock>
+</apex:page>
+
+
+<!--Startup_Project__r.RadEx__Desired_Completion_Date__c, Startup_Project__r.RadEx__Project_Estimated_Completed_Date__c,
+Startup_Project__r.RadEx__ProjectPerComplete__c
+ Lic_Ordered__c, Kit_Delivered__c, Kick_Off_Call_Completed__c, Data_Loaded__c, Org_Tested__c, Users_Deployed__c, Training_Complete__c-->

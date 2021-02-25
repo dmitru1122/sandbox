@@ -1,0 +1,6 @@
+<apex:page standardController="Modules__c" recordSetVar="mod">
+  <h1 style="font-size: x-large;">Modules is for tracking all Compliatric modules and the customizations</h1>
+  <br />
+  <br />
+  <apex:listViews type="Modules__c" />
+</apex:page>

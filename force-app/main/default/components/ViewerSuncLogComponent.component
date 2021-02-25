@@ -1,0 +1,458 @@
+<apex:component controller="ViewerSuncLogComponentController">
+	<apex:attribute name="accountId" description="Account to View logs" type="Id" required="true" assignTo="{!AccountMainId}" />
+
+	<apex:attribute type="Boolean" name="ExtensionMode" assignTo="{!isExtensionMode}" description="Extension Mode"/> 
+	<apex:includescript value="{!URLFOR($Resource.RadEx__MyTraining4, 'javascripts/jquery.min.js')}" />
+	<style >
+		.brMin {  
+			height: 5px;
+		}
+		.brMax {
+			height: 30px; 
+		}
+
+		.outputlabelLightning { 
+			display: block;
+			margin: 0;
+			padding-top: 4px;
+		}
+
+		.selectionDataBlock {
+			padding-left: 20px;
+			padding-right: 20px;
+			display: flex;
+			justify-content:center;
+		}
+
+		.selectionDataBlockInputSection {
+			flex-grow:1;
+		}
+
+		.selectionDataBlockEmptySection {
+			flex-grow:3;
+		}
+
+		.labelInput {
+			font-size: 13pt !important;
+		}
+
+		.icons-wrapper {
+			margin: 8px;
+		}
+
+		.icon-badge {
+			margin-left: 5px; 
+		}
+
+		.contentTableProduct {
+			padding: 20px; 
+			width: 95%;
+		}
+
+		table.mainlyContentTable {
+			width: 95%;
+		}
+
+		.selectionDataBlockInputSection {
+			padding-bottom: 20px;
+		}
+
+		.spinnerCt {
+			position: absolute;
+			left: 50%;
+			top: 35%;
+			-webkit-border-radius: 1em;
+			-moz-border-radius: 1em;
+			border-radius: 1em;
+			border: 1px solid #ceecff;
+			border-top-color: rgb(206, 236, 255);
+			border-top-style: solid;
+			border-top-width: 1px;
+			border-right-color: rgb(206, 236, 255);
+			border-right-style: solid;
+			border-right-width: 1px;
+			border-bottom-color: rgb(206, 236, 255);
+			border-bottom-style: solid;
+			border-bottom-width: 1px;
+			border-left-color: rgb(206, 236, 255);
+			border-left-style: solid;
+			border-left-width: 1px;
+			background: #f5fcff;
+			background-color: rgb(245, 252, 255);
+			padding: 20px 40px 20px 40px;
+			z-index: 200001;
+			-moz-box-shadow: 0 2px 5px #acacac;
+			-webkit-box-shadow: 0 2px 5px #acacac;
+			-box-shadow: 0 2px 5px #acacac;
+		}
+		.mask {
+			width: 100%;
+			height: 100%;
+			background-color: #000;
+			opacity: .45;
+			filter: alpha(opacity=45);
+			position: absolute;
+			z-index: 200000;
+			top: 0;
+			left: 0;
+		}
+
+	</style>
+
+	<script>
+		function setFocusOnLoad() {}
+	</script>
+
+
+	<apex:slds />
+	
+	<apex:form id="form" >
+		<apex:pagemessages id="pageMessages" />
+
+		<apex:actionStatus id="configurationLoader"> 
+			<apex:facet name="start">
+				<div class="spinnerMask" id="spinnerMask">
+					<div class="spinnerCt">
+						<img src="/img/analytics/reportbuilder/icons/spinner32.gif" alt="Loading..." width="32" height="32" align="center" class="spinner1" title="Loading..." />
+						<div class="loadingIndicator">Loading...</div>
+					</div>
+					<div class="mask"></div>
+				</div>
+			</apex:facet>
+		</apex:actionStatus>
+		
+		<apex:pageblock mode="edit" id="pb1" tabStyle="Account" rendered="{!isExtensionMode}">
+				
+			<div class="brMin"/>
+			<div class="slds-page-header">
+				<div class="slds-media">
+					<div class="slds-media__figure">
+						<span class="slds-icon_container slds-icon-standard-metrics" title="Description of icon when needed">
+							<svg class="slds-icon slds-page-header__icon" aria-hidden="true">
+								<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/standard-sprite/svg/symbols.svg#report')}"/>
+							</svg>
+						</span>
+					</div>
+					<div class="slds-media__body">
+						<h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Report">Sync Report</h1>
+						<p class="slds-text-body_small slds-line-height_reset">  </p>
+					</div>
+				</div>
+			</div>
+			
+			<apex:pageBlockSection columns="1" collapsible="true" >
+				<apex:pageblocksectionitem >
+					<apex:outputlabel value="Period From" styleClass="outputlabelLightning" />
+					<apex:outputpanel >
+						<div class="slds-form-element wizard-input-check-required wizard-input-is-required" >
+							<div class="slds-form-element__control">
+								<apex:inputField style="width: 250px;"  styleClass="slds-input" value="{!fromDate.RadEx__Event_Date__c}" />
+							</div>
+						</div>
+					</apex:outputpanel>
+				</apex:pageblocksectionitem>
+	
+				<div class="brMin"/>
+	
+				<apex:pageblocksectionitem >
+					<apex:outputlabel value="Period To" styleClass="outputlabelLightning" />
+					<apex:outputpanel >
+						<div class="slds-form-element wizard-input-check-required wizard-input-is-required" >
+							<div class="slds-form-element__control">
+								<apex:inputField style="width: 250px;" styleClass="slds-input" value="{!toDate.RadEx__Event_Date__c}" />
+							</div>
+						</div>
+					</apex:outputpanel>
+				</apex:pageblocksectionitem> 
+
+				<apex:pageblocksectionitem >
+					<apex:outputlabel value="Type Content Success Status" styleClass="outputlabelLightning" />
+					<apex:outputpanel >
+						<div class="slds-form-element">
+							<div class="slds-form-element__control">
+								<div class="slds-select_container" style="width: 250px;">
+									<apex:selectList size="1" value="{!selectedTypeSync}" styleClass="slds-select">
+										<apex:selectOptions value="{!contentTypeSync}" />
+									</apex:selectList>
+								</div>
+							</div>
+						</div>
+					</apex:outputpanel>
+				</apex:pageblocksectionitem> 
+
+
+
+
+	
+				<div class="brMin"/>
+			
+			</apex:pageBlockSection>   
+			<div class="selectionDataBlock" >
+				<div class="selectionDataBlockInputSection" >
+					<div class="slds-button slds-button_neutral">
+						<apex:commandLink value="Generate Report" id="GenerateReportLink" reRender="form" status="configurationLoader"/>
+					</div>
+
+					<div class="slds-button slds-button_neutral">
+						<apex:commandLink action="{!clearSelected}" value="Clear" reRender="form" status="configurationLoader"/>
+					</div>
+				</div> 
+				<div class="brMax"/>
+			</div>
+			
+		</apex:pageblock>
+
+		<apex:pageblock mode="edit" id="pb2" tabStyle="Account" >
+			<div class="contentTableProduct">
+
+				<table class="slds-table slds-table_bordered slds-table_cell-buffer mainlyContentTable" >
+					<thead>
+						<tr class="slds-line-height_reset">
+							<th class="slds-text-title_caps" scope="col" width="3%">
+								<div class="slds-truncate" title="is Error">Status</div>
+							</th>
+
+							<th class="slds-text-title_caps" scope="col">
+								<div class="slds-truncate" title="Content Name">
+									{!$ObjectType.RadEx__Content_Sync_Log__e.fields.RadEx__Content_Name__c.label}</div>
+							</th>
+
+							<th class="slds-text-title_caps" scope="col">
+								<div class="slds-truncate" title="Type">{!$ObjectType.RadEx__Content_Sync_Log__e.fields.RadEx__Type__c.label}</div>
+							</th>
+
+							<th class="slds-text-title_caps" scope="col">
+								<div class="slds-truncate" title="Date">{!$ObjectType.RadEx__Error_Log__c.fields.RadEx__Event_Date__c.label}</div>
+							</th>
+						</tr>
+					</thead>
+
+					 <tbody >
+						<apex:repeat value="{!listLogController}"  var="logItem">
+		
+							<tr>
+								<td scope="row" data-label="Status" style="text-align:center;">
+									<div class="slds-truncate" >
+										<!-- <apex:image styleClass="image-icon" url="{!URLFOR($Resource.RadEx__images, 'icons/cancel.png')}"/> -->
+										<apex:image styleClass="image-icon" url="{!URLFOR($Resource.RadEx__images, 'icons/Meter_1_9.png')}" />
+										
+									</div>
+								</td> 
+
+								<td scope="row" data-label="Content Name" >
+									<div class="slds-truncate" >
+										<div class="slds-truncate" >
+											<apex:commandLink value="{!logItem.ContentName} ( {!logItem.Counter} )" reRender="pageMessages,form,pb3" status="configurationLoader">
+												<apex:param name="param" value="{!logItem.ContentName}" assignTo="{!SelectedType}"/>
+											</apex:commandLink>
+										</div>
+									</div>
+								</td> 
+
+								<td scope="row" data-label="Type">
+									<div class="slds-truncate" >{!logItem.Type}</div>
+								</td> 
+
+								<td scope="row" data-label="Date">
+									<div class="slds-truncate" >
+										<apex:outputText value="{0,date,M/d/yyy h:mm a}">
+											<apex:param value="{!logItem.EventDate}"/>
+										</apex:outputText>
+									</div>
+								</td> 
+
+							</tr>
+						</apex:repeat>
+					</tbody>
+				</table>
+			</div>
+		
+			<apex:pageblockButtons location="bottom" id="buttonsId">
+
+				<div class="slds-button-group" role="group">
+					<apex:commandButton value="First Page" rerender="pb2" styleClass="slds-button slds-button_neutral" action="{!FirstPage}" disabled="{!prev}" />
+					<apex:commandButton value="Previous" rerender="pb2"  styleClass="slds-button slds-button_neutral" action="{!previous}" disabled="{!prev}"/>
+					<apex:commandButton value="Next" rerender="pb2" styleClass="slds-button slds-button_neutral" action="{!next}" disabled="{!nxt}"/>
+					<apex:commandButton value="Last Page" rerender="pb2" styleClass="slds-button slds-button_neutral" action="{!LastPage}" disabled="{!nxt}"/>
+				</div>
+
+			</apex:pageblockButtons>
+		</apex:pageblock>
+
+		
+		<apex:pageblock mode="edit" id="pb3" tabStyle="Account" rendered="{!listLogSelected.size > 0}">
+			
+			<div class="contentTableProduct">
+
+				<table class="slds-table slds-table_bordered slds-table_cell-buffer mainlyContentTable" >
+					<thead>
+						<tr class="slds-line-height_reset">
+							<th class="slds-text-title_caps" scope="col" width="3%">
+								<div class="slds-truncate" title="is Error">Status</div>
+							</th>
+
+							<th class="slds-text-title_caps" scope="col">
+								<div class="slds-truncate" title="Content Name">
+									<apex:commandLink action="{!doResearchSuccess}" status="configurationLoader" reRender="pb3" value="{!$ObjectType.RadEx__Content_Sync_Log__e.fields.RadEx__Content_Name__c.label}" >
+										<apex:param name="selectedfieldsuccess" value="RadEx__Class_Name__c" />
+									</apex:commandLink>
+								</div>
+							</th>
+
+							<th class="slds-text-title_caps" scope="col">
+								<div class="slds-truncate" title="Type">
+									<apex:commandLink action="{!doResearchSuccess}" status="configurationLoader" reRender="pb3" value="{!$ObjectType.RadEx__Content_Sync_Log__e.fields.RadEx__Type__c.label}" >
+										<apex:param name="selectedfieldsuccess" value="RadEx__Error_Code__c" />
+									</apex:commandLink>
+								</div>
+							</th>
+
+							<th class="slds-text-title_caps" scope="col">
+								<div class="slds-truncate" title="Date">
+									<apex:commandLink action="{!doResearchSuccess}" status="configurationLoader" reRender="pb3" value="{!$ObjectType.RadEx__Error_Log__c.fields.RadEx__Event_Date__c.label}" >
+										<apex:param name="selectedfieldsuccess" value="RadEx__Event_Date__c" />
+									</apex:commandLink>
+								</div>
+							</th>
+						</tr>
+					</thead>
+
+					 <tbody >
+						<apex:repeat value="{!listLogSelected}"  var="logItem">
+		
+							<tr>
+								<td scope="row" data-label="Status" style="text-align:center;">
+									<div class="slds-truncate" >
+										<apex:image styleClass="image-icon" url="{!URLFOR($Resource.RadEx__images, 'icons/Meter_1_9.png')}" />
+									</div>
+								</td> 
+
+								<td scope="row" data-label="Content Name" >
+									<div class="slds-truncate" >
+										<div class="slds-truncate" >
+											{!logItem.ContentName}
+										</div>
+									</div>
+								</td> 
+
+								<td scope="row" data-label="Type">
+									<div class="slds-truncate" >{!logItem.Type}</div>
+								</td> 
+
+								<td scope="row" data-label="Date">
+									<div class="slds-truncate" >
+										<apex:outputText value="{0,date,M/d/yyy h:mm a}">
+											<apex:param value="{!logItem.EventDate}"/>
+										</apex:outputText>
+									</div>
+								</td> 
+
+							</tr>
+						</apex:repeat>
+					</tbody>
+				</table>
+			</div>
+		
+			<apex:pageblockButtons location="bottom" id="buttonsId">
+
+				<div class="slds-button-group" role="group">
+					<apex:commandButton value="First Page" rerender="pb3" styleClass="slds-button slds-button_neutral" action="{!FirstPageSelected}" disabled="{!prevSelected}" />
+					<apex:commandButton value="Previous" rerender="pb3"  styleClass="slds-button slds-button_neutral" action="{!previousSelected}" disabled="{!prevSelected}"/>
+					<apex:commandButton value="Next" rerender="pb3" styleClass="slds-button slds-button_neutral" action="{!nextSelected}" disabled="{!nxtSelected}"/>
+					<apex:commandButton value="Last Page" rerender="pb3" styleClass="slds-button slds-button_neutral" action="{!LastPageSelected}" disabled="{!nxtSelected}"/>
+				</div>
+
+			</apex:pageblockButtons>
+		</apex:pageblock>
+
+
+		<apex:pageblock mode="edit" id="pb4" tabStyle="Account" rendered="{!listLogErrorSelected.size > 0}">
+			
+			<div class="contentTableProduct">
+
+				<table class="slds-table slds-table_bordered slds-table_cell-buffer mainlyContentTable" >
+					<thead>
+						<tr class="slds-line-height_reset">
+							<th class="slds-text-title_caps" scope="col" width="3%">
+								<div class="slds-truncate" title="is Error">Status</div>
+							</th>
+
+							<th class="slds-text-title_caps" scope="col">
+								<div class="slds-truncate" title="Content Name">
+									<apex:commandLink action="{!doResearchError}" reRender="pb4" value="Object Error" status="configurationLoader">
+										<apex:param name="selectedfield"  value="RadEx__Class_Name__c" />
+									</apex:commandLink>
+								</div>
+							</th>
+
+							<th class="slds-text-title_caps" scope="col">
+								<div class="slds-truncate" title="Type">
+									{!$ObjectType.RadEx__Error_Log__c.fields.RadEx__Error_Message__c.label}
+								</div>
+							</th>
+
+							<th class="slds-text-title_caps" scope="col">
+								<div class="slds-truncate" title="Date">
+									<apex:commandLink action="{!doResearchError}" reRender="pb4" value="{!$ObjectType.RadEx__Error_Log__c.fields.RadEx__Event_Date__c.label}" status="configurationLoader">
+										<apex:param name="selectedfield" value="RadEx__Event_Date__c" />
+									</apex:commandLink>
+								</div>
+							</th>
+						</tr>
+					</thead>
+
+					 <tbody >
+						<apex:repeat value="{!listLogErrorSelected}"  var="logItem">
+		
+							<tr>
+								<td scope="row" data-label="Status" style="text-align:center;">
+									<div class="slds-truncate" >
+										<apex:image styleClass="image-icon" url="{!URLFOR($Resource.RadEx__images, 'icons/Meter_16_24.png')}" />
+									</div>
+								</td> 
+
+								<td scope="row" data-label="Content Name" >
+									<div class="slds-truncate" >
+										<div class="slds-truncate" >
+											{!logItem.ContentName}
+										</div>
+									</div>
+								</td> 
+
+								<td scope="row" data-label="Type">
+									<div class="slds-truncate" >{!logItem.log.RadEx__Error_Message__c}</div>
+								</td> 
+
+								<td scope="row" data-label="Date">
+									<div class="slds-truncate" >
+										<apex:outputText value="{0,date,M/d/yyy h:mm a}">
+											<apex:param value="{!logItem.EventDate}"/>
+										</apex:outputText>
+									</div>
+								</td> 
+
+							</tr>
+						</apex:repeat>
+					</tbody>
+				</table>
+			</div>
+		
+			<apex:pageblockButtons location="bottom" id="buttonsIdError">
+
+				<div class="slds-button-group" role="group">
+					<apex:commandButton value="First Page" rerender="pb4" styleClass="slds-button slds-button_neutral" action="{!FirstPageError}" disabled="{!prevError}" />
+					<apex:commandButton value="Previous" rerender="pb4"  styleClass="slds-button slds-button_neutral" action="{!previousError}" disabled="{!prevError}"/>
+					<apex:commandButton value="Next" rerender="pb4" styleClass="slds-button slds-button_neutral" action="{!nextError}" disabled="{!nxtError}"/>
+					<apex:commandButton value="Last Page" rerender="pb4" styleClass="slds-button slds-button_neutral" action="{!LastPageError}" disabled="{!nxtError}"/>
+				</div>
+
+			</apex:pageblockButtons>
+		</apex:pageblock>
+
+
+
+		<script>
+
+		</script>
+	</apex:form>
+</apex:component>

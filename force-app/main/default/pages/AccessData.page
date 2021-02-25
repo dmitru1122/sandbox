@@ -1,0 +1,27 @@
+<apex:page standardController="Account" extensions="AccessDataController">
+    <apex:form id="CheckoutForm">
+		<apex:pageMessages id="messages"/>
+		<apex:pageBlock title="Access Data" mode="detail" id="PaymentFlowSetupBlock" rendered="{!NotError}">
+			<apex:pageBlockButtons id="OSButtons">
+				<apex:commandButton value="Save" action="{!Save}" rerender="CheckoutForm" />
+                <apex:commandButton value="Back" action="{!Back}" rerender="CheckoutForm" />
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection columns="1" title=" " id="PaymentFlowSelection" rendered="true" showHeader="false" collapsible="false">
+				<apex:pageBlockSection columns="1" title="" id="SelectListPF"  showHeader="false" collapsible="false" >
+					<apex:pageBlockSectionItem >
+						<apex:outputLabel value="Username"/>
+						<apex:inputSecret value="{!AccessData.Username__c}" id="theSecretInput"/>
+					</apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+						<apex:outputLabel value="Password"/>
+						<apex:inputSecret value="{!AccessData.Password__c}" id="theSecretInput2"/>
+					</apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+						<apex:outputLabel value="Token"/>
+						<apex:inputSecret value="{!AccessData.Token__c}" id="theSecretInput2"/>
+					</apex:pageBlockSectionItem>
+				</apex:pageBlockSection>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

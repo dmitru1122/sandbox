@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>42.0</apiVersion>
+    <availableInTouch>true</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>Sets banner on Contact prospect page layouts to warn users of &quot;Do Not Contact&quot; alerts</description>
+    <label>Contact Do Not Contact</label>
+    <packageVersions>
+        <majorNumber>1</majorNumber>
+        <minorNumber>814</minorNumber>
+        <namespace>RadEx</namespace>
+    </packageVersions>
+</ApexPage>

@@ -1,0 +1,829 @@
+<template>
+  <div class="hub-navigator__wrapper">
+
+    <!-- HEADER -->
+    <div class="slds-page-header">
+      <div class="slds-page-header__row">
+
+        <!-- HEADER TITLE -->
+        <div class="slds-page-header__col-title">
+          <div class="slds-media">
+            <div class="slds-media__figure hub-navigator__figure">
+              <lightning-icon
+                icon-name="standard:channel_programs"
+                alternative-text={title}
+                title={title}
+              ></lightning-icon>
+            </div>
+            <div class="slds-media__body">
+              <div class="slds-page-header__name">
+                <div class="slds-page-header__name-title">
+                  <h1><span class="slds-page-header__title slds-truncate" title={title}>{title}</span></h1>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HEADER ACTIONS -->
+        <div class="slds-page-header__col-actions">
+          <div class="slds-page-header__controls">
+
+            <div class="refresh">
+
+              <!-- REFRESHING -->
+              <template if:true={isLoadingAutoRefresh}>
+                <span>Refreshing ...</span>
+              </template>
+              <template if:false={isLoadingAutoRefresh}>
+                <template if:true={autoRefreshTitle}>
+                  <span>{autoRefreshTitle}</span>
+                </template>
+              </template>
+
+              <!-- CURRENT EEMPLOYMENT -->
+              <template if:true={showCurrentEemployment}>
+                <!-- <span>({countProcesses} of {countCheckboxes} pending)</span> -->
+                <span>({countProcesses} pending)</span>
+              </template>
+              <template if:false={showCurrentEemployment}>
+                <span>Idle</span>
+              </template>
+
+            </div>
+
+
+            <div class="slds-page-header__control">
+              <lightning-button-group>
+
+                <!-- NEW AUTHORIZATION BUTTON -->
+                <lightning-button
+                  label="New Authorization"
+                  title="Click to Authorize"
+                  onclick={onClickToNewAuthorize}
+                ></lightning-button>
+
+                <!-- VALIDATION BUTTON -->
+                <lightning-button
+                  label="Validation"
+                  title="Click to Validate"
+                  disabled={isDisabledValidationButton}
+                  onclick={onClickToValidation}
+                ></lightning-button>
+
+                <!-- DEPLOY BUTTON -->
+                <lightning-button
+                  label="Deploy"
+                  title="Click to Deploy"
+                  disabled={isDisabledDeployButton}
+                  onclick={onClickToDeploy}
+                ></lightning-button>
+
+                <!-- REFRESH BUTTON -->
+                <lightning-button
+                  label="Refresh"
+                  title="Click to Refresh"
+                  disabled={isLoadingAutoRefresh}
+                  onclick={onClickToRefresh}
+                ></lightning-button>
+
+              </lightning-button-group>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="hub-navigator__content">
+      <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading" size="medium" variant="brand"></lightning-spinner>
+      </template>
+      <template if:false={isLoading}>
+
+        <!-- LIST OF TABLE TBODY -->
+        <table class="hub-navigator__table">
+          <template for:each={tables} for:item="group">
+            <tbody key={group.order} class={group.class}>
+
+              <!-- TABLE TITLE -->
+              <tr class="table__title">
+                <td colspan="8">
+                  <div class="title__wrapper">
+                    <span class="title">{group.name}</span>
+                    <template if:true={group.unlinked}>
+                      <template if:true={countHidden}>
+                        <span class="count-hidden">({countHidden} hidden)</span>
+                      </template>
+                    </template>
+                    <template if:false={group.unlinked}>
+                      <template if:true={group.authorized}>
+                        <template if:true={group.countAuth}>
+                          <span class="count">({group.countAuth}/{group.count})</span>
+                          <span class="count">Selected: {group.countSelected}</span>
+                        </template>
+                        <lightning-button-menu alternative-text="Show menu" icon-size="x-small" menu-alignment="auto">
+                          <lightning-menu-item
+                            data-org-id={group.orgId}
+                            value="openInBrowser"
+                            label="Open in browser"
+                            onclick={onClickOpenInBrowser}
+                          ></lightning-menu-item>
+                        </lightning-button-menu>
+                      </template>
+                      <template if:false={group.authorized}>
+                        <span class="unauthorized">{unauthorizedSourceOrg}</span>
+                      </template>
+                    </template>
+                  </div>
+                </td>
+              </tr>
+
+              <template if:true={group.list.length}>
+
+                <!-- TABLE HEAD -->
+                <tr class="table__thead">
+                  <td class="table__td-checkbox">
+                    <template if:false={group.unlinked}>
+                      <template if:true={group.authorized}>
+                        <template if:true={group.countAuth}>
+                          <lightning-input
+                            type="checkbox"
+                            label=""
+                            variant="label-hidden"
+                            data-id={group.id}
+                            checked={group.selected}
+                            onchange={onChangeGroupCheckbox}
+                          ></lightning-input>
+                        </template>
+                      </template>
+                    </template>
+                  </td>
+                  <td class="table__td-icon table__td-icon-sort">
+                    <lightning-icon
+                      icon-name="utility:picklist_type"
+                      size="x-small"
+                    ></lightning-icon>
+                    <span
+                      data-key="iconSort"
+                      data-group-name={group.name}
+                      title="Click to sort"
+                      class={group.sort.iconSort.class}
+                      onclick={onClickToSortMainTable}
+                    ></span>
+                  </td>
+                  <td>
+                    <span
+                      data-key="name"
+                      data-group-name={group.name}
+                      title="Click to sort"
+                      class={group.sort.name.class}
+                      onclick={onClickToSortMainTable}
+                    >Organization Name</span>
+                  </td>
+                  <td>
+                    <span
+                      data-key="lastSuccessSort"
+                      data-group-name={group.name}
+                      title="Click to sort"
+                      class={group.sort.lastSuccessSort.class}
+                      onclick={onClickToSortMainTable}
+                    >Last Success</span>
+                  </td>
+                  <td>
+                    <span
+                      data-key="lastFailureSort"
+                      data-group-name={group.name}
+                      title="Click to sort"
+                      class={group.sort.lastFailureSort.class}
+                      onclick={onClickToSortMainTable}
+                    >Last Failure</span>
+                  </td>
+                  <td><span class="slds-truncate">Last Duration</span></td>
+                  <td class="table__td-action"></td>
+                </tr>
+
+                <!-- TABLE BODY -->         
+                <template for:each={group.list} for:item="item">
+                  <tr key={item.orgId} class={item.class}>
+
+                    <!-- CHECKBOX -->
+                    <td class="table__td-checkbox">
+                      <template if:false={group.unlinked}> <!-- GROUP IS NOT UNLINKED -->
+                        <template if:true={group.authorized}> <!-- GROUP IS AUTHORIZED -->
+                          <template if:false={item.isDoNotUpdate}> <!-- HUB IS DO NOT UPDATE -->
+                            <template if:false={item.unlinked}> <!-- HUB IS NOT UNLINKED -->
+                              <template if:true={item.authorized}> <!-- HUB IS AUTHORIZED -->
+                                <lightning-input
+                                  type="checkbox"
+                                  label=""
+                                  variant="label-hidden"
+                                  data-id={item.id}
+                                  data-group-id={group.id}
+                                  checked={item.selected}
+                                  disabled={item.progress}
+                                  onclick={onClickItemCheckbox}
+                                  onchange={onChangeItemCheckbox}
+                                ></lightning-input>
+                              </template>
+                            </template>
+                          </template>
+                        </template>
+                      </template>
+                    </td>
+
+                    <!-- PROGRESS & STATUS -->
+                    <td class="table__td-icon">
+
+                      <!-- PROGRESS -->
+                      <template if:true={item.progress}>
+                        <div class="table__progress">
+                          <div class="slds-spinner_container">
+                            <div class="slds-spinner slds-spinner_x-small slds-spinner_brand">
+                              <span class="slds-assistive-text">Loading</span>
+                              <div class="slds-spinner__dot-a"></div>
+                              <div class="slds-spinner__dot-b"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </template>
+
+                      <!-- STATUS -->
+                      <template if:false={item.progress}>
+                        <template if:true={item.showStatus}>
+                          <lightning-icon
+                            icon-name={item.statusIconName}
+                            size="x-small"
+                            variant={item.statusVariant}
+                            title={item.statusTitle}
+                          ></lightning-icon>
+                        </template>
+                      </template>
+
+                    </td>
+
+                    <!-- NAME -->
+                    <td><span class="slds-truncate">{item.name}</span></td>
+
+                    <!-- LAST SUCCESS -->
+                    <td title={item.lastSuccessTitle}>
+                      <span class="slds-truncate">
+                        <template if:true={item.lastSuccess}>{item.lastSuccess}</template>
+                        <template if:false={item.lastSuccess}><span class="table__date-na">{dateNA}</span></template>
+                      </span>
+                    </td>
+
+                    <!-- LAST FAILURE -->
+                    <td title={item.lastFailureTitle}>
+                      <span class="slds-truncate">
+                        <template if:true={item.lastFailure}>{item.lastFailure}</template>
+                        <template if:false={item.lastFailure}><span class="table__date-na">{dateNA}</span></template>
+                      </span>
+                    </td>
+
+                    <!-- DURATION -->
+                    <td><span class="slds-truncate">{item.duration}</span></td>
+
+                    <!-- ACTIONS -->
+                    <td class="table__td-action">
+                      <lightning-button-menu alternative-text="Actions" menu-alignment="auto" icon-size="x-small" disabled={item.isDisabledActions}>
+
+                        <!-- OPEN IN BROWSER -->
+                        <template if:true={item.authorized}>
+                          <lightning-menu-item
+                            data-org-id={item.orgId}
+                            value="openInBrowser"
+                            label="Open in browser"
+                            onclick={onClickOpenInBrowser}
+                          ></lightning-menu-item>
+                        </template>
+
+                        <!-- SHOW HISTORY -->
+                        <template if:true={item.showShowHistory}>
+                          <lightning-menu-item
+                            data-org-id={item.orgId}
+                            value="showHistory" 
+                            label="Show history"
+                            onclick={onClickShowHistory}
+                          ></lightning-menu-item>
+                        </template>
+
+                        <!-- DE-AUTHORIZE -->
+                        <template if:false={item.isDoNotUpdate}>
+                          <template if:false={item.progress}>
+                            <template if:true={item.authorized}>
+                              <lightning-menu-item
+                                data-id={item.id}
+                                data-org-id={item.orgId}
+                                value="deAuthorize" 
+                                label="De-Authorize"
+                                onclick={onClickDeAuthorize}
+                              ></lightning-menu-item>
+                            </template>
+                          </template>
+                        </template>
+
+                        <!-- HIDE FROM HUB NAVIGATOR -->
+                        <template if:true={item.showHideFromHubNavigator}>
+                          <lightning-menu-item
+                            data-id={item.id}
+                            value="hideFromHubNavigator" 
+                            label="Hide from Hub Navigator"
+                            onclick={onClickHideFromHubNavigator}
+                          ></lightning-menu-item>
+                        </template>
+
+                        <template if:false={item.progress}>
+                          <!-- LINK TO SOURCE -->
+                          <template if:true={group.unlinked}>
+                            <lightning-menu-item
+                              data-id={item.id}
+                              value="linkToSource" 
+                              label="Link to source org"
+                              onclick={onClickLinkToSource}
+                            ></lightning-menu-item>
+                          </template>
+  
+                          <!-- UNLINK -->
+                          <template if:false={group.unlinked}>
+                            <lightning-menu-item
+                              data-id={item.id}
+                              data-group-id={group.id}
+                              value="unlinkHubNavigator" 
+                              label={item.unlinkTitle}
+                              onclick={onClickUnlink}
+                            ></lightning-menu-item>
+                          </template>
+                        </template>
+
+                      </lightning-button-menu>
+                    </td>
+                  </tr>
+                </template>
+
+              </template>
+
+              <!-- NO RECORDS -->
+              <template if:false={group.list.length}>
+                <tr class="table__no-records">
+                  <td class="table__td-checkbox"></td>
+                  <td class="table__td-icon"></td>
+                  <td colspan="6"><p>No records to display</p></td>
+                </tr>
+              </template>
+            </tbody>
+
+          </template>
+        </table>
+
+      </template>
+
+    </div>
+
+    <!-- REFRESH NOTIFICATION -->
+    <template if:true={isLoadingAutoRefresh}>
+      <div class="hub-navigator__notification">
+        <div class="slds-scoped-notification slds-media slds-media_center slds-theme_info">
+          <div class="slds-media__figure">
+            <lightning-spinner alternative-text="Loading" variant="inverse" size="small"></lightning-spinner>
+          </div>
+          <div class="slds-media__body"><p>Refreshing...</p></div>
+        </div>
+      </div>
+    </template>
+
+    <!-- MODAL VALIDATE DEPLOY -->
+    <template if:true={modal.show}>
+      <section role="dialog" tabindex="-1" aria-modal="true" aria-describedby="modal-validate-deploy-content" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+              <lightning-icon
+                icon-name="utility:close"
+                alternative-text="Close"
+                title="Close"
+                variant="inverse"
+                size="small"
+                onclick={onClickToCloseModalValidateDeploy}
+              ></lightning-icon>
+            </button>
+            <h2 class="slds-modal__title slds-hyphenate">{modal.title}</h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium" id="modal-validate-deploy-content">
+            <p class="modal-confirm__message">{modal.message}</p>
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning-button
+              label="Cancel"
+              onclick={onClickToCloseModalValidateDeploy}
+              class="slds-m-right_x-small"
+            ></lightning-button>
+            <lightning-button
+              variant="brand"
+              label={modal.submitLabel}
+              disabled={modal.isSubmitDisabled}
+              onclick={onClickToSubmitModalValidateDeploy}
+            ></lightning-button>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!-- MODAL HISTORY -->
+    <template if:true={modalHistory.show}>
+      <section role="dialog" tabindex="-1" aria-modal="true" aria-describedby="modal-history-content" class="modal-history-content slds-modal slds-fade-in-open slds-modal_large">
+        <div class="slds-modal__container">
+
+          <!-- HEADER -->
+          <header class="slds-modal__header">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+              <lightning-icon
+                icon-name="utility:close"
+                alternative-text="Close"
+                title="Close"
+                variant="inverse"
+                size="small"
+                onclick={onClickToCloseModalHistory}
+              ></lightning-icon>
+            </button>
+            <h2 class="slds-modal__title slds-hyphenate">History: {modalHistory.title}</h2>
+          </header>
+
+          <!-- MODAL CONTENT -->
+          <div class="slds-modal__content slds-p-around_medium" id="modal-history-content">
+
+            <!-- IS LOADING -->
+            <template if:true={modalHistory.isLoading}>
+              <template if:false={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="medium" variant="brand"></lightning-spinner>
+              </template>
+            </template>
+
+            <!-- TABLE -->
+            <template if:false={modalHistory.isLoading}>
+              <table class="hub-navigator__table">
+
+                <!-- TABLE HEAD -->
+                <tr class="table__thead">
+                  <td colspan="2">
+                    <span
+                      data-key="startTime"
+                      title="Click to sort"
+                      class={modalHistory.sort.startTime.class}
+                      onclick={onClickToSortHistoryTable}
+                    >Date</span>
+                  </td>
+                  <td colspan="4"><span class="slds-truncate">Status</span></td>
+                  <td><span class="slds-truncate">Source Org</span></td>
+                  <td><span class="slds-truncate">Versions</span></td>
+                  <td><span class="slds-truncate">Duration</span></td>
+                  <td><span class="slds-truncate">Executor</span></td>
+                  <td class="table__td-action"></td>
+                </tr>
+
+                <!-- TABLE BODY -->
+                <template for:each={modalHistory.list} for:item="item">
+                  <tr key={item.index} class={item.class}>
+
+                    <!-- DATE -->
+                    <td title={item.startDateTitle}>
+                      <span class="slds-truncate">{item.startDate}</span>
+                    </td>
+                    <td title={item.startDateTitle}>
+                      <span class="slds-truncate">{item.startDateTime}</span>
+                    </td>
+
+                    <!-- STATUS ICON -->
+                    <td class="table__td-icon">
+
+                      <!-- PROGRESS -->
+                      <template if:true={item.isProcess}>
+                        <div class="table__progress">
+                          <div class="slds-spinner_container">
+                            <div class="slds-spinner slds-spinner_x-small slds-spinner_brand">
+                              <span class="slds-assistive-text">Loading</span>
+                              <div class="slds-spinner__dot-a"></div>
+                              <div class="slds-spinner__dot-b"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </template>
+
+                      <!-- ICON -->
+                      <template if:false={item.isProcess}>
+                        <lightning-icon
+                          icon-name={item.statusIconName}
+                          variant={item.statusVariant}
+                          size="x-small"
+                          title="Title"
+                        ></lightning-icon>
+                      </template>
+
+                    </td>
+
+                    <!-- STATUS NAME -->
+                    <td><span class="slds-truncate">{item.statusTitle}</span></td>
+
+                    <!-- ERROR MESSAGE -->
+                    <td class="table__td-helptext">
+                      <template if:true={item.errorMessage}>
+                        <lightning-helptext icon-name="utility:info_alt" content={item.errorMessage}></lightning-helptext>
+                      </template>
+                    </td>
+
+                    <!-- AGENT MESSAGE -->
+                    <td class="table__td-helptext">
+                      <template if:true={item.agentMessage}>
+                        <lightning-helptext icon-name="utility:macros" content={item.agentMessage}></lightning-helptext>
+                      </template>
+                    </td>
+
+                    <!-- SOURCE ORG -->
+                    <td><span class="slds-truncate">{item.sourceName}</span></td>
+
+                    <!-- VERSION -->
+                    <td><span class="slds-truncate">{item.versionTitle}</span></td>
+
+                    <!-- DURAION -->
+                    <td><span class="slds-truncate">{item.duration}</span></td>
+
+                    <!-- EXECUTOR -->
+                    <td><span class="slds-truncate">{item.username}</span></td>
+
+                    <!-- ACTION -->
+                    <td class="table__td-action">
+                      <lightning-button-menu alternative-text="Actions" icon-size="x-small" menu-alignment="auto" disabled={item.isDisabledActions}>
+                        <lightning-menu-item
+                          data-run-id={item.runId}
+                          value="details"
+                          label="Details"
+                          onclick={onClickDetails}
+                        ></lightning-menu-item>
+                      </lightning-button-menu>
+                    </td>
+
+                  </tr>
+                </template>
+              </table>
+            </template>
+
+          </div>
+
+          <!-- MODAL FOOTER -->
+          <footer class="slds-modal__footer">
+            <lightning-button
+              label="Cancel"
+              onclick={onClickToCloseModalHistory}
+              class="slds-m-right_x-small"
+            ></lightning-button>
+          </footer>
+
+        </div>
+      </section>
+      <template if:false={modalDetail.show}>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+      </template>
+    </template>
+
+    <!-- MODAL DE-AUTHORIZE -->
+    <template if:true={modalDeAuthorize.show}>
+      <section role="dialog" tabindex="-1" aria-modal="true" aria-describedby="modal-de-authorize-content" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+              <lightning-icon
+                icon-name="utility:close"
+                alternative-text="Close"
+                title="Close"
+                variant="inverse"
+                size="small"
+                onclick={onClickToCloseModalDeAuthorize}
+              ></lightning-icon>
+            </button>
+            <h2 class="slds-modal__title slds-hyphenate">{modalDeAuthorize.title}</h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium" id="modal-de-authorize-content">
+            <p class="modal-confirm__message">{modalDeAuthorize.message}</p>
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning-button
+              label="Cancel"
+              onclick={onClickToCloseModalDeAuthorize}
+              class="slds-m-right_x-small"
+            ></lightning-button>
+            <lightning-button
+              variant="brand"
+              label={modalDeAuthorize.submitLabel}
+              onclick={onClickToSubmitModalDeAuthorize}
+            ></lightning-button>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!-- MODAL DETAIL -->
+    <template if:true={modalDetail.show}>
+      <section role="dialog" tabindex="-1" aria-modal="true" aria-describedby="modal-detail-content" class="modal-detail__section slds-modal slds-fade-in-open slds-modal_medium">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+              <lightning-icon
+                icon-name="utility:close"
+                alternative-text="Close"
+                title="Close"
+                variant="inverse"
+                size="small"
+                onclick={onClickToCloseModalDetail}
+              ></lightning-icon>
+            </button>
+            <h2 class="slds-modal__title slds-hyphenate">Detail <span style="text-transform: capitalize;">{modalDetail.detail.mode}</span> : {modalDetail.detail.startDateTitle}</h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_x-small" id="modal-detail-content">
+            <lightning-layout multiple-rows>
+              <!-- row -->
+              <lightning-layout-item size="3" class="slds-p-around_x-small">
+                <div class="modal-detail__col-title slds-truncate">Id</div>
+                <div class="modal-detail__col-label slds-truncate">{modalDetail.detail.runId}</div>
+              </lightning-layout-item>
+              <lightning-layout-item size="3" class="slds-p-around_x-small">
+                <div class="modal-detail__col-title slds-truncate">Source Name</div>
+                <div class="modal-detail__col-label slds-truncate">{modalDetail.detail.sourceName}</div>
+              </lightning-layout-item>
+              <lightning-layout-item size="3" class="slds-p-around_x-small">
+                <div class="modal-detail__col-title slds-truncate">Mode</div>
+                <div class="modal-detail__col-label slds-truncate" style="text-transform: capitalize;">{modalDetail.detail.mode}</div>
+              </lightning-layout-item>
+              <lightning-layout-item size="3" class="slds-p-around_x-small">
+                <div class="modal-detail__col-title slds-truncate">Status</div>
+                <div class="modal-detail__col-label slds-truncate" style="text-transform: capitalize;">{modalDetail.detail.status}</div>
+              </lightning-layout-item>
+              <!-- row -->
+              <lightning-layout-item size="3" class="slds-p-around_x-small">
+                <div class="modal-detail__col-title slds-truncate">Agent Name</div>
+                <div class="modal-detail__col-label slds-truncate">{modalDetail.detail.agentName}</div>
+              </lightning-layout-item>
+              <lightning-layout-item size="3" class="slds-p-around_x-small">
+                <div class="modal-detail__col-title slds-truncate">Agent Version</div>
+                <div class="modal-detail__col-label slds-truncate">{modalDetail.detail.agentVersion}</div>
+              </lightning-layout-item>
+              <lightning-layout-item size="3" class="slds-p-around_x-small">
+                <div class="modal-detail__col-title slds-truncate">From Version</div>
+                <div class="modal-detail__col-label slds-truncate">{modalDetail.detail.fromVersion}</div>
+              </lightning-layout-item>
+              <lightning-layout-item size="3" class="slds-p-around_x-small">
+                <div class="modal-detail__col-title slds-truncate">To Version</div>
+                <div class="modal-detail__col-label slds-truncate">{modalDetail.detail.toVersion}</div>
+              </lightning-layout-item>
+              <!-- row -->
+              <lightning-layout-item size="6" class="slds-p-around_x-small">
+                <div class="modal-detail__col-title slds-truncate">User Name</div>
+                <div class="modal-detail__col-label slds-truncate">{modalDetail.detail.username}</div>
+              </lightning-layout-item>
+              <lightning-layout-item size="6" class="slds-p-around_x-small"></lightning-layout-item>
+              <!-- row -->
+              <lightning-layout-item size="4" class="slds-p-around_x-small">
+                <div class="modal-detail__col-title slds-truncate">Start Date</div>
+                <div class="modal-detail__col-label slds-truncate">{modalDetail.detail.startDateTitle}</div>
+              </lightning-layout-item>
+              <lightning-layout-item size="4" class="slds-p-around_x-small">
+                <div class="modal-detail__col-title slds-truncate">Finish Date</div>
+                <div class="modal-detail__col-label slds-truncate">{modalDetail.detail.finishDateTitle}</div>
+              </lightning-layout-item>
+              <lightning-layout-item size="4" class="slds-p-around_x-small">
+                <div class="modal-detail__col-title slds-truncate">Duration</div>
+                <div class="modal-detail__col-label slds-truncate">{modalDetail.detail.duration}</div>
+              </lightning-layout-item>
+              <!-- row -->
+              <template if:true={modalDetail.detail.errorMessage}>
+                <lightning-layout-item size="12" class="slds-p-around_x-small">
+                  <div class="modal-detail__col-title slds-truncate">Error Message</div>
+                  <div class="modal-detail__col-label">{modalDetail.detail.errorMessage}</div>
+                </lightning-layout-item>
+              </template>
+            </lightning-layout>
+
+            <!-- TABLE -->
+            <template if:true={modalDetail.detail.components.length}>
+              <div class="slds-p-around_x-small">
+              <div class="slds-modal__title slds-m-top_x-small slds-m-bottom_xx-small">Components</div>
+                <table class="hub-navigator__table">
+                  <!-- TABLE HEAD -->
+                  <tr class="table__thead">
+                    <td><span class="slds-truncate">Name</span></td>
+                    <td><span class="slds-truncate">Deploy</span></td>
+                    <td><span class="slds-truncate">Exclude</span></td>
+                  </tr>
+                  <!-- TABLE BODY -->
+                  <template for:each={modalDetail.detail.components} for:item="item">
+                    <tr key={item.index} class="table__tr">
+                      <td><span class="slds-truncate">{item.name}</span></td>
+                      <td><span class="slds-truncate">{item.deploy}</span></td>
+                      <td><span class="slds-truncate">{item.exclude}</span></td>
+                    </tr>
+                  </template>
+                </table>
+              </div>
+            </template>
+
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning-button
+              label="Cancel"
+              class="slds-m-right_x-small"
+              onclick={onClickToCloseModalDetail}
+            ></lightning-button>
+          </footer>
+        </div>
+      </section>
+      <div class="modal-detail__backdrop slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!-- MODAL UNLINK -->
+    <template if:true={modalUnlink.show}>
+      <section role="dialog" tabindex="-1" aria-modal="true" aria-describedby="modal-unlink-content" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+              <lightning-icon
+                icon-name="utility:close"
+                alternative-text="Close"
+                title="Close"
+                variant="inverse"
+                size="small"
+                onclick={onClickToCloseModalUnlink}
+              ></lightning-icon>
+            </button>
+            <h2 class="slds-modal__title slds-hyphenate">{modalUnlink.title}</h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium" id="modal-unlink-content">
+            <p class="modal-confirm__message">{modalUnlink.message}</p>
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning-button
+              class="slds-m-right_x-small"
+              label="Cancel"
+              onclick={onClickToCloseModalUnlink}
+            ></lightning-button>
+            <lightning-button
+              variant="brand"
+              label="Yes, unlink"
+              onclick={onClickToSubmitModalUnlink}
+            ></lightning-button>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!-- MODAL LINK TO SOURCE -->
+    <template if:true={modalLinkToSource.show}>
+      <section role="dialog" tabindex="-1" aria-modal="true" aria-describedby="modal-link-to-source-content" class="modal-link-to-source slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+              <lightning-icon
+                icon-name="utility:close"
+                alternative-text="Close"
+                title="Close"
+                variant="inverse"
+                size="small"
+                onclick={onClickToCloseModalLinkToSource}
+              ></lightning-icon>
+            </button>
+            <h2 class="slds-modal__title slds-hyphenate">{modalLinkToSource.title}</h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium" id="modal-link-to-source-content">
+            <p class="modal-confirm__message">{modalLinkToSource.message}</p>
+            <lightning-combobox
+              name="progress"
+              label="Source org"
+              variant="label-hidden"
+              value={modalLinkToSource.value}
+              placeholder="Select Source org"
+              options={modalLinkToSource.options}
+              onchange={onChangeSelectModalLinkToSource}
+            ></lightning-combobox>
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning-button
+              class="slds-m-right_x-small"
+              label="Cancel"
+              onclick={onClickToCloseModalLinkToSource}
+            ></lightning-button>
+            <lightning-button
+              variant="brand"
+              label="Yes, link"
+              disabled={modalLinkToSourceSubmitIsDisable}
+              onclick={onClickToSubmitModalLinkToSource}
+            ></lightning-button>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+  </div>
+</template>

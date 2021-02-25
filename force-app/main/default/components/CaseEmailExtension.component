@@ -1,0 +1,15 @@
+<apex:component controller="CaseEmailExtension" access="global">
+<apex:attribute name="caseId" type="Id" description="Case Id" assignTo="{!csId}" access="global" />
+<apex:attribute name="RenderHTML" type="boolean" description="Render as HTML" access="global" />
+<apex:repeat value="{!sortEmails}" var="email" rows="1" rendered="{!RenderHTML}">
+    <apex:outputPanel rendered="{!email.HtmlBody!=null}">
+        <apex:outputText value="{!email.HtmlBody}" escape="false"/>
+    </apex:outputPanel>
+    <apex:outputPanel rendered="{!email.HtmlBody=null}">
+        <apex:outputText value="{!email.TextBody}" escape="false"/>
+    </apex:outputPanel>
+</apex:repeat>
+<apex:repeat value="{!sortEmails}" var="email" rows="1" rendered="{!!RenderHTML}">
+{!email.TextBody}
+</apex:repeat>
+</apex:component>

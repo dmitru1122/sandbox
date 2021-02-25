@@ -1,0 +1,254 @@
+<apex:page showHeader="false" id="SiteTemplate" standardStylesheets="false" language="{!$CurrentPage.Parameters.lang}">
+<link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.pymt__PaymentConnect,'styles/sites_basic.css')}" />
+
+<!-- <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.pymt__PaymentConnect,'styles/trust_logos.css')}" /> -->
+<link href='https://fonts.googleapis.com/css?family=Metrophobic' rel='stylesheet' type='text/css' />
+<link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.quot__QuotesAndInvoices,'styles/sites_basic.css')}" />
+
+<link rel="icon" 
+      type="image/png" 
+      href="{!$Site.CurrentSiteURL}resource/1430848357000/favicon" />
+
+
+<style>
+.pc_page_content td {
+   padding:2px;
+}
+.pc_product_name {
+  font-size:16px;
+  }
+.pc_product_price_quantity_box {
+  margin-bottom:8px;
+  }
+</style>
+
+
+
+<style>
+
+/* Javascript menu bar styling */
+
+#pc_menubar_wrapper {
+    width:100%;
+    border: 0px;
+    padding:0px;
+    margin:0px;
+    background: transparent;
+    margin-bottom:5px;
+    }
+#pc_menubar
+{   margin: 0;
+    padding: 0;
+    z-index: 30}
+
+#pc_menubar li
+{   margin: 0;
+    padding: 0;
+    list-style: none;
+    float: left;
+    font: bold 14px arial}
+
+#pc_menubar li a
+{   display: block;
+    margin: 0 0px 0 0;
+    border: 1px solid transparent;
+    padding: 8px 10px;
+    width: 110px;
+    background: #5970B2;
+    background: transparent;
+    color: #FFF;
+    text-align: center;
+    text-decoration: none}
+
+#pc_menubar li a:hover
+{   
+    background: #004670;
+    background: #2E84B7;
+    border: 1px solid #FFF;
+}
+
+#pc_menubar div
+{   position: absolute;
+    visibility: hidden;
+    margin: 0;
+    padding: 0;
+    background: #EAEBD8;
+    border: 1px solid #6699CC;
+    border-top: 0px;
+    }
+
+    #pc_menubar div a
+    {   position: relative;
+        display: block;
+        margin: 0;
+        padding: 5px 10px;
+        width: auto;
+        white-space: nowrap;
+        text-align: left;
+        text-decoration: none;
+        background: #fff;  /* dropdown background color */
+        color: #484848;
+        font: 14px arial}
+
+#pc_menubar div a:hover {   
+    background: #e0e0e0;
+    color: #004670}
+    
+
+    
+</style>
+
+
+<style>
+
+body {
+    <!-- font-family: trebuchet MS, Verdana, Geneva; -->
+    font-family: 'Metrophobic', sans-serif;
+    font:  "Metrophobic",sans-serif;
+    padding:0px;
+    margin:0px;
+    background:#1696C0;
+    background-repeat:repeat-x;
+}
+
+
+
+
+
+h1, h2, h3 {
+    color:#1696C0;
+    margin-top:0px;
+    margin-bottom:0px;
+}
+
+
+h1 {margin-top:20px;margin-bottom:10px;}
+h2 {margin-top:15px;}
+
+ 
+
+.pc_frame_top {
+    background-color:transparent;
+    width:960px;
+    height:100px;
+    margin-left:auto;
+    margin-right:auto;
+    padding:0px;
+}
+
+.pc_page_content table {
+    border-collapse:collapse;
+}
+ 
+#navbar {
+    color:white;
+    padding:5px 0px;
+}
+
+#navbar a {
+    color:white;
+    padding: 5px 10px;
+    text-decoration:none;
+    border: solid 1px transparent;
+}
+#navbar a:hover {
+    border: solid 1px white;
+    
+}
+
+.clearfix
+{
+display: inline-block;
+}
+
+a {
+text-decoration: none;
+}
+
+a:hover 
+{
+text-decoration: underline;
+}
+
+a {
+   color: #219118;
+
+}
+
+table td {
+    vertical-align:top;
+    padding:2px;
+}  
+
+.labelColumn {padding-right:5px;}
+.fieldColumn {margin-left:0px;padding-left:2px;}
+.fieldColumn input {margin-left:0px;}
+
+.pc_frame {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    margin-top:20px;
+    width: 960px;
+    display:block;
+    background-color:transparent;
+}
+
+.pc_frame_inner {
+    padding:5px;
+   background-color:white;
+}
+
+.pc_page_content {background-color:white;}
+
+.pc_page_content_inner { padding:10px 20px 100px 20px; }
+
+.box {
+border: 1px solid #dddddd;
+}
+
+.rounded-corners-5 {
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+
+
+.pc_frame .message {
+    background-color:#EAF3F5;
+    border-color:#99ccff;
+    background-color:#ffffcc;
+    border-color:#ffcc00; 
+}
+
+.evt_sessions_more_info_link {
+    padding-bottom:20px;
+    font-size:.75em;
+}
+
+
+
+</style>
+
+
+
+
+
+    <div class="pc_frame box rounded-corners-5" >
+
+    <div class="pc_frame_inner">
+    <span><img height="50px" src="{!$Site.CurrentSiteURL}resource/1433890246000/ProviderTracLogo" /></span>
+    <apex:insert name="body"/>
+
+
+
+    <apex:insert name="footer">
+    <!--  Add custom footer here -->
+    <div style="text-align:center">{!$Label.site.powered_by} <a href="http://www.linvio.com">Linvio PaymentConnect</a></div>
+    </apex:insert>
+    
+    </div><!--  end pc_frame_inner -->
+    </div><!--  end pc_frame -->
+
+</apex:page>

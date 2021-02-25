@@ -1,0 +1,51 @@
+/*
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin:0;
+}
+
+.cCenterPanel {
+	flex: 5;
+	min-height: 600px;
+}
+*/
+
+.cCenterPanel {
+	height: 100%;
+	padding-bottom: 75px;
+}
+
+.cFooterPanel {
+	z-index: 1000;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+
+@media only screen and (max-height: 820px) {
+    .cFooterPanel {
+       position: inherit;
+       bottom: 0;
+       width: 100%;
+   }
+}
+/*
+.cFooterPanel {
+	bottom: 0;
+    width: 100%;
+	height: 75px;
+	flex: 1;
+}
+*/
+
+/*@media only screen and (max-height: 820px) {
+    .cFooterPanel {
+       position: inherit;
+       bottom: 0;
+       width: 100%;
+   }
+}
+*/

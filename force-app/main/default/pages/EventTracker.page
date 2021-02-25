@@ -1,0 +1,55 @@
+<apex:page showHeader="false" sidebar="false">
+
+<style type="text/css">
+        body {
+            background: #E0E0E0;
+        }
+        
+        .FlowPageBlockBtns
+        {
+            position:relative;
+            right:360px;
+        }
+        
+        p.FlowTitle {
+            font-size:25px;
+            font-weight: bold;
+            text-align: center;
+        } 
+        
+        .FlowContainer {
+            line-height: 150%;
+            margin-left: 50px;
+            margin-top: 10px;
+            padding: 50px 40px;
+            width: 800px;
+            background-color: #808080;
+            
+            } 
+            
+        body .bPageBlock .pbHeader{
+            background: #FF4719;
+        }
+
+        body .bPageBlock  .pbBottomButtons {
+            background: #FF4719;
+        }
+
+        body .bPageBlock .pbBody {
+        width: 800px;
+        }
+        
+ 
+</style>
+
+
+
+    <c><p style='position-left:300px'><strong style='color:#EC5B02;' ><apex:image width="200px" height="50x" url="{!URLFOR($Resource.Logo)}"/></strong><Br/></p></c>
+
+    <c> 
+    <flow:interview name="Event_Opportunity" buttonStyle="color:#505050; background-color:#000000; border:3px solid;" >
+    </flow:interview>
+    </c>
+
+
+</apex:page>

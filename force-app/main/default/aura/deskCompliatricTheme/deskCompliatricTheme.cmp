@@ -1,0 +1,146 @@
+<aura:component  >
+	<div class="wrapper">
+      <div class="content">
+        <div id="hero" class="hero-override">
+          <div id="desk-header">
+            <div class="mobile-hat">
+              <a href="#desk-mobile-menu" id="desk-mobile-menu-toggle" class="btn visible-phone"/> <a href="#desk-mobile-search" id="desk-mobile-search-toggle" class="btn visible-phone pull-right"/>
+            </div><a href="//compliatric.force.com">
+            <div id="logo"/></a> 
+            <div id="right-nav">
+              <span class="submit-ticket">Welcome, Guest</span> <a href="/customer/authentication/multipass?return_to=%2F" class="submit-ticket">Login</a>
+            </div>
+            <div id="desk-mobile-search" class="visible-phone">
+              <div class="container">
+                <div class="menu-item">
+                  <form action="/customer/en/portal/articles/search" method="get" id="support-search-ornot" class="support-search-small-ornot" name="support-search-ornot">
+                    <div>
+                      <input id="q2" maxlength="100" name="q" type="text" value="" class="ui-autocomplete-input-ornot" autocomplete="on" placeholder="Enter a search term here."/> 
+                      <div style="clear: both;"/>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div id="desk-mobile-header" class="visible-phone">
+              <div class="container">
+                <div class="row">
+                  <div class="span12">
+                    <ul id="desk-support-mobile-header-nav">
+                      <li>
+                        {!v.profileMenu}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="container">
+              <div class="row hidden-phone pull-right">
+                <ul id="desk-support-header-nav" class="nav nav-pills">
+                  <li>
+                  </li>
+                  <li id="desk-lang-dropdown" class="dropdown">
+                    <a href="#" class="btn"/>
+                  </li>
+                </ul>
+              </div>
+              <div class="row logo-section"/>
+            </div>
+          </div>
+          <div id="desk-search" class="hidden-phone">
+            <div class="container">
+              <div class="row">
+                <div class="help-center">
+                  <span class="help">Welcome to Compliatric!</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        <div id="desk-content">
+          <div class="container" id="index_wrapper">
+            <div class="row-fluid">
+              <div id="index_body">
+                <div id="boxes-bg">
+                  <div class="boxes-container">
+                    <a href="/customer/authentication/multipass?return_to=%2F" class="kb">
+                    <h3>
+                      Login
+                    </h3>
+                    <p>
+                      Click here to login to Compliatric
+                    </p></a> <a href="https://compliatric.com/Resetting%20Your%20Compliatric%20Password.pdf" target="_blank" class="kb">
+                    <h3>
+                      Password Reset Help
+                    </h3>
+                    <p>
+                      View this PDF if you need help resetting your Compliatric password
+                    </p></a> <a href="mailto:support@compliatric.com?Subject=Login%20Help" class="kb">
+                    <h3>
+                      Login Help
+                    </h3>
+                    <p>
+                      Send an email to Compliatric Support if you are experiencing trouble signing in
+                    </p></a> 
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="footer-wrapper" class="clearfix">
+      <footer id="footer" class="container_12">
+        <ul class="footer-widget-container grid_4 left">
+          <li class="widget widget_text left">
+            <a href="http://compliatric.com/index.html"><img src="sfsites/c/resource/desk_import/images/logo-footer.png" alt="logo"/></a>
+          </li>
+          <li class="widget widget_text right">
+            <div class="title">
+              <h5>
+                <a href="//compliatric.desk.com" class="btn-medium btn-color"><span>Back To Homepage</span></a>
+              </h5>
+            </div>
+          </li>
+        </ul>
+        <ul class="footer-widget-container grid_4 right">
+          <li class="widget widget_text">
+            <br/>
+            &amp;nbsp;<br/>
+            <ul class="social-links">
+              <li>
+                <a href="https://twitter.com/compliatric" class="pixons-twitter-1"/>
+              </li>
+              <li>
+                <a href="http://www.linkedin.com/company/compliatric?trk=company_logo" class="pixons-linkedin"/>
+              </li>
+              <li>
+                <a href="https://www.facebook.com/pages/Compliatric/571273172917818" class="pixons-facebook-1"/>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </footer>
+      <section class="copyright-container">
+        <div class="container_12">
+          <div class="grid_6">
+            &#xA9; Copyright 2019 Compliatric. All rights reserved.
+          </div>
+          <div class="grid_6">
+            <a href="http://www.desk.com/">Customer service software</a> powered by Desk.com
+          </div>
+          <div class="grid_6 right">
+            <ul class="footer-contact-info list-inline">
+              <li class="phone">888.878.8897&amp;nbsp;
+              </li>
+              <li class="mail">
+                <a href="mailto:support@compliatric.com">support@compliatric.com</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+    </div>
+</aura:component>

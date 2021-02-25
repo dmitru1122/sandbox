@@ -1,0 +1,15 @@
+<apex:page action="{!IF($Profile.Name !='System Administrator', null , urlFor($Action.EmailMessage.Delete, Id, [retURL=Id], true))}" standardController="EmailMessage" standardStylesheets="true">
+    <apex:form >
+        <table cellspacing="10">
+            <tr>
+                <td><span style="font-weight: bold; font-size: 12pt;">Insufficient Privileges</span></td>
+            </tr>
+            <tr>
+                <td>You do not have the level of access necessary to perform the operation you requested. Please contact your administrator if access is necessary.<br/></td>
+            </tr>
+            <tr>
+                <td><apex:commandButton action="{!cancel}" immediate="true" value="Go Back"/></td>
+            </tr>
+        </table>
+    </apex:form>
+</apex:page>

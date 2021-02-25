@@ -1,0 +1,34 @@
+<apex:page controller="AccountHotlineController" standardStylesheets="false" lightningStylesheets="true" showHeader="false" sidebar="false" applyBodyTag="true">
+
+<apex:includeScript value="{!URLFOR($Resource.RadEx__jqueryLibrary,'v2.1.4/jquery-2.1.4.min.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.RadEx__BootstrapBS,'js/bootstrap.min.js')}" />
+<apex:stylesheet value="{!URLFOR($Resource.RadEx__BootstrapBS,'css/bootstrap.min.css')}" />
+<style>
+    .flex-container {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        height: 500px;
+    }
+    .flex-container > div {
+        margin: 3px;
+        padding: 3px;
+    }
+</style>
+<div class="bs">
+    <div class="container body-content">
+        <div class="jumbotron">
+        <h1>Incident Reporting Hotline Customers</h1>
+        </div>
+
+        <apex:pageBlock >
+        <div class="flex-container">
+            <apex:repeat value="{!HotlineAccounts}" var="ha">
+                <div><apex:outputLink styleClass="btn btn-primary" value="{!ha.Incident_Reporting_URL__c}" title="{!ha.Name}" target="_blank">{!ha.Name}</apex:outputLink></div>                
+            </apex:repeat>
+        </div>            
+        </apex:pageBlock>
+    </div>
+</div>
+
+</apex:page>

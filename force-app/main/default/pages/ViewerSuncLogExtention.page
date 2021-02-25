@@ -1,0 +1,10 @@
+<apex:page standardController="Account" action="{!actionOnLoadPage}" extensions="ViewerSuncLogExtentionController" docType="html-5.0" >
+	
+	
+
+
+	<c:ViewerSuncLogComponent id="componentSyncLog" accountId="{!Account.Id}" ExtensionMode="true" />
+
+
+
+</apex:page>

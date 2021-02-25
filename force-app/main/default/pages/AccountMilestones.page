@@ -1,0 +1,24 @@
+<apex:page standardController="Account" sidebar="false" showHeader="false" extensions="AccountMilestonesController" title="Account Milestones" lightningStylesheets="true">
+
+<apex:form >
+    <apex:pageMessages />
+
+        <apex:pageblock id="CustomList" title="Related Milestones">
+
+            <apex:pageBlockButtons location="top">
+                <apex:commandLink styleClass="btn" target="_blank" value="Manage Milestone Tasks" id="Manage" action="{!redirectToMillestone}" style="margin-top:20px;text-decoration:none;padding:4px;" rendered="{!projectId != NULL}"/>
+                <apex:commandLink styleClass="btn" value="New Project" target="_blank" id="New" action="{!redirectToMillestone}" style="margin-top:20px;text-decoration:none;padding:4px;" rendered="{!projectId == NULL}"/>
+            </apex:pageBlockButtons>
+
+            <apex:outputText value="Project Not Defined" rendered="{!projectId == NULL}" style="font-weight:bold;"/>
+
+            <apex:pageBlockTable value="{!Milestones}" var="m" rendered="{!projectId != NULL}">
+                <apex:column headerValue="Milestone Task Name" ><apex:outputLink value="/{!m.id}" target="top">{!m.name}</apex:outputLink></apex:column>
+                <apex:column headerValue="Est. Date Complete" value="{!m.RadEx__Estimated_Milestone_Complete_Date__c}" />
+                <apex:column value="{!m.RadEx__Milestone_Percent_Complete__c}" />
+            </apex:pageBlockTable>
+
+        </apex:pageblock>
+</apex:form>
+
+</apex:page>

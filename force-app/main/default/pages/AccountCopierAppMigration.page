@@ -1,0 +1,5 @@
+<apex:page standardController="Account">
+  <apex:repeat value="{!Account.Orgs__r}" var="orgValue">
+      <apex:outputField value="{!orgValue.Last_Success_Layout_Migration_Date__c}" />
+  </apex:repeat>
+</apex:page>

@@ -1,0 +1,507 @@
+<apex:page showheader="true" sidebar="false" docType="html-5.0" controller="TaskRunScriptToCustomerController">
+	<apex:includeScript value="{!URLFOR($Resource.RadEx__MassEditor, 'js/jquery_min.js')}" />		
+	<style>
+
+		.brMin {
+			height: 5px;
+		}
+
+		.outputlabelLightning { 
+			display: block;
+			margin: 0;
+			padding-top: 4px;
+		}
+
+		.thAccTitLab {
+			padding-top:5px;
+			padding-bottom:5px;
+		}
+
+	</style>
+
+		<script>
+			function setFocusOnLoad() {}
+
+
+		function callPopUpNewTask() {	
+			
+			$('#PromptCreateNew').show();
+		}
+
+		function closePopUpNewTask() {	
+			$('#PromptCreateNew').hide();
+		}
+
+		function toggleSelectionSLDS(elem) {
+
+			if ($(elem).closest( ".slds-section").hasClass("slds-is-open")) {
+				$(elem).closest( ".slds-section__title").next().slideUp("slow",function() {
+					$(elem).closest( ".slds-section").removeClass("slds-is-open");
+				});
+			} else {
+				$(elem).closest( ".slds-section").addClass("slds-is-open");
+				$(elem).closest( ".slds-section__title").next().slideDown("slow");
+			}
+		}
+
+		function toggleThisDrowDown(elem) {
+			if($(elem).hasClass("slds-is-open")) {
+				$(elem).removeClass("slds-is-open")
+			} else {
+				$(elem).addClass("slds-is-open");
+			}
+
+			$(".custom-slds-drop-down-task").each((index,elemCl)=>{
+				if(elemCl != elem) $(elemCl).removeClass("slds-is-open")
+			});
+		}
+
+
+
+		function changeTaskSubject() {
+			const TaskSubjectVal = document.getElementById('{!$Component.form.TaskSubjectVal}').value;
+
+			if(TaskSubjectVal && TaskSubjectVal !== '') {
+				if ($('#TaskSubjectBlock').hasClass("slds-has-error"))  $('#TaskSubjectBlock').removeClass("slds-has-error");
+			} else {
+				$('#TaskSubjectBlock').addClass("slds-has-error");
+				
+			}
+		}
+
+		</script>
+
+
+	<apex:slds />
+	
+	<apex:pagemessages id="pageMessages" />
+	<apex:form id="form" >
+
+		<apex:actionFunction name="setStage" action="{!DoSetStage}" rerender="pb1,pb0,pb2,pageMessages">
+			<apex:param name="p1" assignTo="{!Stage}" value=""/>
+		</apex:actionFunction>
+
+		<apex:actionFunction name="updateData" action="{!research}" rerender="pb1,pb0,pb2,pageMessages"/> 	
+		<apex:actionFunction name="createNewTasks" action="{!createNewTasks}" oncomplete="closePopUpNewTask();" rerender="pb1,pb0,pb2,pageMessages"></apex:actionFunction>
+
+		<apex:pageblock mode="edit" id="pb0" tabStyle="Account">
+
+		<div class="slds-page-header" style="display: flex; justify-content:space-between; ">
+			<div class="slds-media">
+				<div class="slds-media__figure">
+					<span class="slds-icon_container slds-icon-standard-orders" title="Description of icon when needed">
+						<svg class="slds-icon slds-page-header__icon" aria-hidden="true">
+							<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/standard-sprite/svg/symbols.svg#orders')}"/>
+						</svg>
+					</span>
+				</div>
+				<div class="slds-media__body">
+					<h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Tasks Run Script To Customers">Tasks Run Script To Customers</h1>
+					<p class="slds-text-body_small slds-line-height_reset">On this page you can assign and manage scripting tasks for organizations</p>
+				</div>
+			</div>
+			<div>
+			</div>
+		</div>
+		<div class="brMin"/>
+
+		<div style="display: flex; justify-content: space-around; align-items:center; flex-wrap: nowrap;padding-bottom:30px; " >	
+
+			<div class="slds-form-element">
+				<label class="slds-form-element__label" for="text-input-id-1">{!$ObjectType.Task_Run_Script__c.fields.Due_Date__c.label} From</label>
+				<div class="slds-form-element__control">
+					<apex:inputField style="width: 250px;"  styleClass="slds-input" value="{!fakeStartDate.Due_Date__c}" onchange="updateData();" />
+				</div>
+			</div>
+
+			<div class="slds-form-element">
+				<label class="slds-form-element__label" for="text-input-id-1">{!$ObjectType.Task_Run_Script__c.fields.Due_Date__c.label} To</label>
+				<div class="slds-form-element__control">
+					<apex:inputField style="width: 250px;" styleClass="slds-input" value="{!fakeForDate.Due_Date__c}" onchange="updateData();"  />
+				</div>
+			</div>
+
+			<div class="slds-form-element" style="padding-right:30px;"> 
+				<label class="slds-checkbox_toggle slds-grid">
+					<span class="slds-form-element__label slds-m-bottom_none">All Time</span>
+					<apex:inputCheckbox value="{!AllTime}"  onchange="updateData();" />
+
+					<span id="checkbox-toggle-2" class="slds-checkbox_faux_container" aria-live="assertive">
+					<span class="slds-checkbox_faux"></span>
+					<span class="slds-checkbox_on">Enabled</span>
+					<span class="slds-checkbox_off">Disabled</span>
+					</span>
+				</label>
+			</div>
+		
+			<div class="slds-button slds-button_neutral" onclick="callPopUpNewTask()">Create New Run Task</div>
+		</div>
+
+		<article class="slds-card">
+			<div class="slds-card__body slds-card__body_inner">
+				<div class="slds-path">
+				<div class="slds-grid slds-path__track">
+					<div class="slds-grid slds-path__scroller-container">
+					<div class="slds-path__scroller" role="application">
+						<div class="slds-path__scroller_inner">
+						<ul class="slds-path__nav" role="listbox" aria-orientation="horizontal">
+
+							<apex:repeat value="{!TaskStages}" var="stageItem">
+								<li class="slds-path__item slds-is-incomplete {!IF(stageItem.isCheked,'slds-is-current slds-is-active','slds-is-incomplete')}" role="presentation">
+								<div aria-selected="false" class="slds-path__link"  onclick="setStage('{!stageItem.Val}');"  id="path" role="option" tabindex="{!IF(stageItem.isCheked,'0','-1')}">
+									<span class="slds-path__stage">
+									<svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+										<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/utility-sprite/svg/symbols.svg#check')}"/>
+									</svg>
+									</span>
+									<apex:outputpanel rendered="{!stageItem.isCheked}" styleClass="slds-assistive-text" layout="inline">Current Stage: </apex:outputpanel>
+									<span class="slds-path__title">{!stageItem.Label}</span>
+								</div>
+								</li>
+							</apex:repeat>
+						</ul>
+						</div>
+					</div>
+					</div>
+				</div>
+				</div>
+			</div>
+			</article>
+
+		</apex:pageblock>
+
+		<apex:pageblock mode="edit" id="pb1" tabStyle="Account">
+
+			<table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_resizable-cols slds-table_col-bordered" role="grid">
+			<thead>
+				<tr class="slds-line-height_reset">
+				<th class="" scope="col" style="width: 12%;text-align:center"><div class="slds-truncate tablacelHeader thAccTitLab" title="Record">Record</div></th>
+				<th class="" scope="col" style="width: 10%;text-align:center"><div class="slds-truncate tablacelHeader thAccTitLab" title="Tasks">Tasks</div></th>
+				<th class="" scope="col" style="width: 10%;text-align:center"><div class="slds-truncate tablacelHeader thAccTitLab" title="Version">{!$ObjectType.Task_Run_Script__c.fields.After_Version__c.label}</div></th>
+				<th class="" scope="col"><div class="slds-truncate tablacelHeaderthAccTitLab" style="text-align:center " title="Description">{!$ObjectType.Task_Run_Script__c.fields.Short_Description__c.label}</div></th>
+				<th class="" scope="col" style="width: 10%;text-align:center" align="center"><div class="slds-truncate tablacelHeader thAccTitLab" title="Date">{!$ObjectType.Task_Run_Script__c.fields.Due_Date__c.label}</div></th>
+				<th class="" scope="col" style="width: 7%; text-align:center"><div class="slds-truncate tablacelHeader thAccTitLab" title="Stage">{!$ObjectType.Task_Run_Script__c.fields.Stage__c.label}</div></th>
+				</tr>
+			</thead>
+			<tbody>
+				<apex:repeat value="{!ListScripTasks}" var="taskItem" >
+
+					<tr aria-selected="false"  class="slds-hint-parent">
+
+					<th data-label="Document Name" scope="row" role="gridcell" class="slds-text-align_center">
+						<apex:outputLink styleClass="slds-truncate" value="/{!taskItem.Id}" target="_blank">{!taskItem.Name}</apex:outputLink>
+					</th>
+					<td data-label="Document Type" role="gridcell" class="slds-text-align_center">
+						<apex:commandLink styleClass="slds-truncate" value="Open List Tasks"  action="{!openTaskThisRunAction}" rerender="pb1,pb2,pageMessages">
+							<apex:param name="erg" value="{!taskItem.ID}" assignTo="{!RunTaskSelectedID}"/>
+						</apex:commandLink>
+					</td>
+					<td data-label="Document Type" role="gridcell" class="slds-text-align_center"><div class="slds-truncate" title="{!taskItem.After_Version__c}">{!taskItem.After_Version__c}</div></td>
+					<td data-label="Document Type" role="gridcell"><div class="slds-truncate" title="{!taskItem.Short_Description__c}">{!taskItem.Short_Description__c}</div></td>
+					<td data-label="Document Type" role="gridcell" class="slds-text-align_center"><div class="slds-truncate" >
+						<apex:outputText value="{0,date,dd' 'MMMMM' 'yyyy}">
+							<apex:param value="{!taskItem.Due_Date__c}"/>
+						</apex:outputText>
+					</div></td>
+					
+					<td data-label="Document Type" role="gridcell" class="slds-text-align_center"><div class="slds-truncate" title="{!taskItem.Stage__c}">{!taskItem.Stage__c}</div></td>
+					</tr>
+				</apex:repeat>
+			</tbody>
+			</table>
+
+		</apex:pageblock>
+
+		<apex:outputPanel id="popNewTasks"  >
+		
+		<div class="demo-only" style="height: 640px;display:none" id="PromptCreateNew" > 
+			<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+				<div class="slds-modal__container">
+				<header class="slds-modal__header">
+
+					<h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Create New Run Script</h2>
+				</header>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+
+				<div style="display:flex;justify-content: space-around; align-items:center; ">
+
+
+					 <div class="slds-form-element" >
+						<apex:commandLink styleClass="slds-button slds-button_neutral" value="Unselect All"  action="{!doUnselectAllOrg}" rerender="tableRepeatedORGs"/>
+					</div> 
+
+
+					<div class="slds-form-element" >
+						<label class="slds-form-element__label" for="text-input-id-1">{!$ObjectType.Task_Run_Script__c.fields.Due_Date__c.label}</label>
+						<div class="slds-form-element__control">
+							<apex:inputField style="width: 250px;"  styleClass="slds-input" value="{!newRunScripts.Due_Date__c}"  />
+						</div>
+					</div>
+
+					<div class="slds-form-element" >
+						<label class="slds-form-element__label" for="text-input-id-1">{!$ObjectType.Task_Run_Script__c.fields.After_Version__c.label}</label>
+						<div class="slds-form-element__control">
+							<apex:inputField style="width: 250px;"  styleClass="slds-input" value="{!newRunScripts.After_Version__c}"  />
+						</div>
+					</div>
+				</div>
+
+
+				<div class="slds-form-element" >
+					<label class="slds-form-element__label" for="text-input-id-1">{!$ObjectType.Task_Run_Script__c.fields.Short_Description__c.label}</label>
+					<div class="slds-form-element__control">
+						<apex:inputField styleClass="slds-input" value="{!newRunScripts.Short_Description__c}"  />
+					</div>
+				</div>
+
+
+				<div class="slds-form-element slds-has-error" id="TaskSubjectBlock">
+					<label class="slds-form-element__label" for="text-input-id-1">{!$ObjectType.Task.fields.Subject.label}</label>
+					<div class="slds-form-element__control">
+						<apex:inputText style=""  styleClass="slds-input" value="{!TaskSubject}" maxlength="255" onkeyup="changeTaskSubject()"  id="TaskSubjectVal" />
+					</div>
+				</div>
+
+				
+				<div class="slds-form-element" style="padding-top:10px;padding-bottom:10px;">
+					<label class="slds-checkbox">
+							<apex:inputcheckbox id="isinstance" styleclass="slds-input" value="{!TaskToAccountOwner}" />
+							<span class="slds-checkbox--faux"></span>
+							<span class="slds-form-element__label">Task to the Account Owner</span>
+					</label>
+				</div>
+					
+
+				<div class="slds-section ">
+					<h3 class="slds-section__title">
+						<button aria-controls="filter-section-control-id" aria-expanded="false" class="slds-button slds-section__title-action" onclick="toggleSelectionSLDS(this);return false;" style="background-color: #cfeef8;">
+							<svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+								<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/utility-sprite/svg/symbols.svg#switch')}" />
+							</svg>
+							<span class="slds-truncate" title="Description And Script">Description And Script</span> 
+						</button>
+					</h3>
+
+					<div aria-hidden="true" class="slds-section__content" id="filter-section-control-id" >
+
+						<div style="display: flex; flex-direction:column;justify-content: space-around; align-items:center; flex-wrap: nowrap;" >
+
+							<div class="slds-form-element" style="width:99%">
+								<label class="slds-form-element__label" for="text-input-id-1">{!$ObjectType.Task_Run_Script__c.fields.Description__c.label}</label>
+								<div class="slds-form-element__control">
+									<apex:inputtextarea style=""   styleClass="slds-input" value="{!newRunScripts.Description__c}"  />
+									
+								</div>
+							</div>
+
+							<div class="slds-form-element" style="width:99%">
+								<label class="slds-form-element__label" for="text-input-id-1">{!$ObjectType.Task_Run_Script__c.fields.Script__c.label}</label>
+								<div class="slds-form-element__control">
+									<apex:inputtextarea styleClass="slds-input" value="{!newRunScripts.Script__c}"  />
+								</div>
+							</div>
+
+						</div> 
+					</div>
+				</div> 
+
+				<apex:outputPanel id="tableRepeatedORGs">
+
+				
+				<table class="slds-table slds-table_bordered slds-table_fixed-layout  slds-table_col-bordered" role="grid">
+					<thead>
+						<tr class="slds-line-height_reset">
+						<th class="" scope="col" style="width: 10%;text-align:center"><div class="slds-truncate tablacelHeader" title="Open"></div></th>	
+						<th class="" scope="col" style="width: 10%;text-align:center"><div class="slds-truncate tablacelHeader" title="Is Active">Include</div></th>	
+						<th class="" scope="col" style="text-align:center"><div class="slds-truncate tablacelHeader" title="Name">Name</div></th>
+						</tr>
+					</thead>
+						<tbody>
+						<apex:repeat value="{!listAccountWR}" var="accountItem" id="repeatedORGs">
+
+							<tr aria-selected="false"  class="slds-hint-parent">
+							<th data-label="Document Name" scope="row" role="gridcell" class="slds-text-align_center">
+								<apex:outputLink value="/{!accountItem.acc.Id}" target="_blank">Open</apex:outputLink>
+
+							</th>
+							<td class="slds-text-align_center" role="gridcell">
+
+								<div class="slds-form-element">
+								<div class="slds-form-element__control">
+									<div class="slds-checkbox">
+									<apex:inputcheckbox styleclass="slds-input" value="{!accountItem.isCheked}" id="ChexboxAccSelect" />
+									<label class="slds-checkbox__label" for="{!$Component.form.repeatedORGs.ChexboxAccSelect}">
+										<span class="slds-checkbox_faux"></span>
+										<span class="slds-form-element__label"></span>
+									</label>
+									</div>
+								</div>
+								</div> 
+							</td>
+							<th data-label="Document Name" scope="row" role="gridcell" class="slds-text-align_center">{!accountItem.acc.Name}</th>
+							
+							</tr>
+						</apex:repeat>
+
+					</tbody>
+				</table>
+				</apex:outputPanel>
+				</div>
+				<footer class="slds-modal__footer">
+					<div class="slds-button slds-button_neutral" onclick="closePopUpNewTask()">Cancel</div>
+					<div class="slds-button slds-button_neutral" onclick="createNewTasks()">Create New</div>
+				</footer>
+				</div>
+			</section>
+			<div class="slds-backdrop slds-backdrop_open"></div>
+			</div>
+		</apex:outputPanel>
+
+		<apex:pageblock mode="edit" id="pb2" tabStyle="Account">	
+
+		<apex:outputPanel id="popCurrentTasks"  rendered="{!isShowPopUpRunTaskSelected}">
+		
+		<div class="demo-only"  id="PromptCreateNew" > 
+			<section role="dialog" style="min-height:800px;" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+				<div class="slds-modal__container">
+				<header class="slds-modal__header">
+
+					<h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!RunTaskSelected.Short_Description__c}</h2>
+				</header>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"> 
+
+				<div class="slds-text-align_center">{!RunTaskSelected.Description__c}</div> 
+
+				<div class="demo-only" style="width:30rem">
+				<article class="slds-tile">
+					<div class="slds-tile__detail">
+					<dl class="slds-list_horizontal slds-wrap">
+						<dt class="slds-item_label slds-text-color_weak slds-truncate" title="{!$ObjectType.Task_Run_Script__c.fields.Stage__c.label}">{!$ObjectType.Task_Run_Script__c.fields.Stage__c.label}:</dt>
+						<dd class="slds-item_detail slds-truncate" title="Description"><span class="slds-badge">{!RunTaskSelected.Stage__c} </span></dd>
+
+						<dt class="slds-item_label slds-text-color_weak slds-truncate" title="All Tasks">All Tasks:</dt>
+						<dd class="slds-item_detail slds-truncate" title="Description">{!countAllTaskSelectedRunScript}</dd>
+
+						<dt class="slds-item_label slds-text-color_weak slds-truncate" title="Completed Tasks">Completed Tasks:</dt>
+						<dd class="slds-item_detail slds-truncate" title="Description">{!countCompletedTaskSelectedRunScript}</dd>
+					</dl>
+					</div>
+				</article>
+				</div>
+
+				<div style="display:flex;justify-content: space-around; align-items:center;padding:20px 0px; ">
+
+					<div>
+						Change {!$ObjectType.Task_Run_Script__c.fields.Stage__c.label}
+						<div class="custom-slds-drop-down-task slds-dropdown-trigger slds-dropdown-trigger_click slds-text-align_center" onclick="toggleThisDrowDown(this)" >
+							<div class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" tabindex="0" title="More actions for Acme - 1,200 Widgets">
+							<svg class="slds-button__icon slds-button__icon_hint slds-button__icon_small" aria-hidden="true">
+								<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/utility-sprite/svg/symbols.svg#down')}"/>
+							</svg>
+							<span class="slds-assistive-text">Change Status</span>
+							</div>
+								<div class="slds-dropdown slds-dropdown_actions slds-dropdown_right">
+								<ul class="slds-dropdown__list" role="menu">
+								<apex:repeat value="{!RunTaskStatus}" var="stutusTaskRunItem">
+									<li class="slds-dropdown__item" role="presentation">
+										<apex:commandLink styleClass="slds-truncate" html-role="menuitem" value="{!RunTaskStatus[stutusTaskRunItem]}"  action="{!changeStatusRunRaskScript}" rerender="popCurrentTasks">
+											<apex:param name="statusVal2" value="{!stutusTaskRunItem}" assignTo="{!ChangedStatusRunScriptTask}"/>
+										</apex:commandLink>
+									</li>
+									</apex:repeat>
+								</ul>
+							</div>
+						</div>
+					</div>
+
+					<div >
+						<apex:commandLink styleClass="slds-button slds-button_text-destructive" value="Mark All Completed"  action="{!changeStatusRunRaskScript}" rerender="pb1,pb2">
+							<apex:param name="statusVal3" value="{!COMPLETED_ALL}" assignTo="{!ChangedStatusRunScriptTask}"/>
+						</apex:commandLink>
+					</div>
+
+				</div>   
+
+				<table class="slds-table slds-table_bordered slds-table_fixed-layout  slds-table_col-bordered" role="grid">
+					<thead>
+						<tr class="slds-line-height_reset">
+						<th class="" scope="col" style="width: 8%;text-align:center"><div class="slds-truncate tablacelHeader" title="Open"></div></th>	
+						<th class="" scope="col" style="text-align:center"><div class="slds-truncate tablacelHeader" title="Org Name">Name</div></th>
+						<th class="" scope="col" style="width: 15%;text-align:center"><div class="slds-truncate tablacelHeader" title="Name">Stage</div></th>
+						
+						<th class="" scope="col" style="width: 15%;text-align:center"><div class="slds-truncate tablacelHeader" title="Name">Change Status To</div></th>
+						<th class="" scope="col" style="width: 18%;text-align:center"><div class="slds-truncate tablacelHeader" title="Completed"></div></th>
+						</tr>
+					</thead>
+						<tbody>
+						<apex:repeat value="{!ListStandartTask}" var="taskItem" id="repeatedTasks">
+
+							<tr aria-selected="false"  class="slds-hint-parent">
+							<th data-label="Document Name" scope="row" role="gridcell" class="slds-text-align_center">
+								<apex:outputLink value="/{!taskItem.Id}" target="_blank">Open</apex:outputLink>
+							</th>
+							<td data-label="Document Name" scope="row" role="gridcell" class="slds-text-align_center slds-truncate">
+								<apex:outputLink value="/{!taskItem.Organization__c}" target="_blank">
+									{!taskItem.Organization__r.Name}
+								</apex:outputLink>
+							</td>
+
+							<td data-label="Document Name" scope="row" role="gridcell" class="slds-text-align_center">{!taskItem.Status}</td>
+
+							<th role="gridcell" class="slds-text-align_center">
+
+								<div class="custom-slds-drop-down-task slds-dropdown-trigger slds-dropdown-trigger_click " onclick="toggleThisDrowDown(this)" >
+									<div class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" tabindex="0" title="More actions for Acme - 1,200 Widgets">
+									<svg class="slds-button__icon slds-button__icon_hint slds-button__icon_small" aria-hidden="true">
+										<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/utility-sprite/svg/symbols.svg#down')}"/>
+									</svg>
+									<span class="slds-assistive-text">Change Status</span>
+									</div>
+										<div class="slds-dropdown slds-dropdown_actions slds-dropdown_right">
+										<ul class="slds-dropdown__list" role="menu">
+										<apex:repeat value="{!taskStatus}" var="stutusTaskItem">
+											<li class="slds-dropdown__item" role="presentation">
+												<apex:commandLink styleClass="slds-truncate" html-role="menuitem" value="{!taskStatus[stutusTaskItem]}"  action="{!changeStatusSepareteStandartTask}" rerender="popCurrentTasks">
+													<apex:param name="statusVal" value="{!stutusTaskItem}" assignTo="{!ChangedStatusTask}"/>
+													<apex:param name="taskId" value="{!taskItem.Id}" assignTo="{!taskIdChangeStatus}"/>
+												</apex:commandLink>
+											</li>
+											</apex:repeat>
+										</ul>
+									</div>
+								</div>
+
+							</th>				
+							<td data-label="Document Name" scope="row" role="gridcell" class="slds-text-align_center">
+								<apex:commandLink styleClass="slds-button slds-button_success" value="Mark Completed"  action="{!changeStatusSepareteStandartTask}" rerender="popCurrentTasks">
+									<apex:param name="statusVal" value="Completed" assignTo="{!ChangedStatusTask}"/>
+									<apex:param name="taskId" value="{!taskItem.Id}" assignTo="{!taskIdChangeStatus}"/>
+								</apex:commandLink>						
+							</td>
+							
+							</tr>
+						</apex:repeat>
+
+					</tbody>
+				</table>
+				<div style="height:100px;"></div>
+				</div>
+				<footer class="slds-modal__footer">
+					<apex:commandLink styleClass="slds-button slds-button_neutral" value="Cancel"  action="{!openTaskThisRun}" rerender="pb1,pb2">
+						<apex:param name="erg" value="" assignTo="{!RunTaskSelectedID}"/>
+					</apex:commandLink>
+				</footer>
+				</div>
+			</section>
+			<div class="slds-backdrop slds-backdrop_open"></div>
+			</div>
+		</apex:outputPanel>
+
+		</apex:pageblock>
+
+	</apex:form>
+
+
+	
+
+</apex:page>

@@ -1,0 +1,86 @@
+<apex:page showHeader="false" sidebar="false" standardController="Modules__c" extensions="HierarchyModuleAssetsController">
+    <apex:pageBlock >
+		<apex:form >
+			<apex:pageBlockTable value="{!wrappers}" var="wrap" id="table">
+				<apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.Name.label}">
+					<apex:facet name="header">
+						<apex:commandLink action="{!sortTable}" value="{!$ObjectType.Module_Assets__c.fields.Name.label}{!IF(sortExpression=='Name',IF(SortDirection='ASC','▼','▲'),'')}" style="color:black;" rerender="table">
+							<apex:param value="Name" name="column" assignTo="{!sortExpression}" ></apex:param>
+						</apex:commandLink>
+					</apex:facet>
+					<div style="margin-left: {!HTMLENCODE(TEXT(wrap.depth * 20))}px;">
+						<a href="/{!wrap.ma.Id}" target="_blank" >
+							<apex:outputField value="{!wrap.ma.Name}" />
+						</a>
+					</div>
+				</apex:column>
+
+				<apex:column headerValue="Type">
+					<apex:facet name="header">
+						<apex:commandLink action="{!sortTable}" value="Type{!IF(sortExpression=='RecordType',IF(SortDirection='ASC','▼','▲'),'')}" style="color:black;" rerender="table">
+							<apex:param value="RecordType" name="column" assignTo="{!sortExpression}" ></apex:param>
+						</apex:commandLink>
+					</apex:facet>
+					<apex:outputField value="{!wrap.ma.RecordType.Name}" />
+				</apex:column>
+
+				<apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.Module__c.label}">
+					<apex:facet name="header">
+						<apex:commandLink action="{!sortTable}" value="{!$ObjectType.Module_Assets__c.fields.Module__c.label}{!IF(sortExpression=='Module__c',IF(SortDirection='ASC','▼','▲'),'')}" style="color:black;" rerender="table">
+							<apex:param value="Module__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+						</apex:commandLink>
+					</apex:facet>
+					<apex:outputField value="{!wrap.ma.Module__c}" />
+				</apex:column>
+
+				<apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.MA_Status__c.label}">
+					<apex:facet name="header">
+						<apex:commandLink action="{!sortTable}" value="{!$ObjectType.Module_Assets__c.fields.MA_Status__c.label}{!IF(sortExpression=='MA_Status__c',IF(SortDirection='ASC','▼','▲'),'')}" style="color:black;" rerender="table">
+							<apex:param value="MA_Status__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+						</apex:commandLink>
+					</apex:facet>
+					<apex:outputField value="{!wrap.ma.MA_Status__c}" />
+				</apex:column>
+
+				<apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.Module_Asset_Type__c.label}">
+					<apex:facet name="header">
+						<apex:commandLink action="{!sortTable}" value="{!$ObjectType.Module_Assets__c.fields.Module_Asset_Type__c.label}{!IF(sortExpression=='Module_Asset_Type__c',IF(SortDirection='ASC','▼','▲'),'')}" style="color:black;" rerender="table">
+							<apex:param value="Module_Asset_Type__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+						</apex:commandLink>
+					</apex:facet>
+					<apex:outputField value="{!wrap.ma.Module_Asset_Type__c}" />
+				</apex:column>
+
+				<apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.Days_Before__c.label}">
+					<apex:facet name="header">
+						<apex:commandLink action="{!sortTable}" value="{!$ObjectType.Module_Assets__c.fields.Days_Before__c.label}{!IF(sortExpression=='Days_Before__c',IF(SortDirection='ASC','▼','▲'),'')}" style="color:black;" rerender="table">
+							<apex:param value="Days_Before__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+						</apex:commandLink>
+					</apex:facet>
+					<apex:outputField value="{!wrap.ma.Days_Before__c}" />
+				</apex:column>
+
+				<apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.Notification_Type__c.label}">
+					<apex:facet name="header">
+						<apex:commandLink action="{!sortTable}" value="{!$ObjectType.Module_Assets__c.fields.Notification_Type__c.label}{!IF(sortExpression=='Notification_Type__c',IF(SortDirection='ASC','▼','▲'),'')}" style="color:black;" rerender="table">
+							<apex:param value="Notification_Type__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+						</apex:commandLink>
+					</apex:facet>
+					<apex:outputField value="{!wrap.ma.Notification_Type__c}" />
+				</apex:column>
+
+				<apex:column headerValue="{!$ObjectType.Module_Assets__c.fields.Client_Account__c.label}">
+					<apex:facet name="header">
+						<apex:commandLink action="{!sortTable}" value="{!$ObjectType.Module_Assets__c.fields.Client_Account__c.label}{!IF(sortExpression=='Client_Account__c',IF(SortDirection='ASC','▼','▲'),'')}" style="color:black;" rerender="table">
+							<apex:param value="Client_Account__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+						</apex:commandLink>
+					</apex:facet>
+						<apex:outputField value="{!wrap.ma.Client_Account__c}" />
+				</apex:column>
+			</apex:pageBlockTable>
+			<apex:facet name="footer">
+				<apex:outputText value="{!message}" rendered="{!!hasRecords}"/>
+			</apex:facet>
+		</apex:form>
+	</apex:pageBlock>
+</apex:page>

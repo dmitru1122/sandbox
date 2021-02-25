@@ -1,0 +1,32 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" applyHtmlTag="false" cache="false" contentType="text/html" >
+	<html>
+		<head>
+			<meta charset="utf-8" />
+			<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+			<meta name="viewport" content="width=device-width, initial-scale=1" />
+		</head>
+
+		<body>
+
+		<style type="text/css">
+				input[type="text"] {
+					width: 15%;
+				}
+				textarea[type="text"] {
+					width: 15%;
+				}
+				select {
+					width: 15%;
+				}
+
+		</style>
+
+			<div class="panel-body">
+				<apex:insert name="header"/>
+				<apex:insert name="body"/>
+				<apex:insert name="footer"/>
+			</div>
+
+		</body>
+	</html>
+</apex:page>

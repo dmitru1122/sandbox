@@ -1,0 +1,64 @@
+<apex:component >
+
+<!--<apex:includeScript value="{!URLFOR($Resource.migrationJS, 'js/jquery-2.1.4.min.js')}"/>-->
+<apex:includeScript value="{!URLFOR($Resource.migrationJS, 'js/bootstrap.min.js')}"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<apex:stylesheet value="{!URLFOR($Resource.migrationJS, 'css/bootstrap-theme.min.css')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.migrationJS, 'css/bootstrap.min.css')}"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<style>
+body {font-size: 12px;}
+.sr-only {
+ top: -2px;
+ position: relative !important;
+}
+.progress {
+	width:15%;
+	height:35%;
+	border: double 3px #A6ACCA
+}
+.block {
+	position:absolute;
+	padding-top: 20%;
+	background-color:rgba(255,255,255,0.3);
+	z-index:98;
+	display:none;
+	border: double 3px #A6ACCA;
+	top: 0;
+	left: 0;
+}
+.elavation {
+	
+}
+</style>
+<div class="block" id="wait">
+  	<center>
+		<div class="progress">
+		  <div class="progress-bar  active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%; ">
+		    <span class="sr-only"> Processing. Please wait... </span>
+		  </div>
+		</div>
+	</center>
+</div>
+<script>
+  jQuery.fn.wait = function() {
+	    $( this ).click(function() {
+		  show();
+		});
+		return this;
+	};
+	function show() {
+	    $('.block').css({"width":"100%","height":"100%"});
+		$("#wait").show();
+	}
+	function hide() {
+		$("#wait").hide();
+		//$(".sr-only").html('');
+	}
+	function setText(t) {
+		//$(".sr-only").html('Processing...');
+	}
+	$(document).ready(function () {
+	});
+</script>
+</apex:component>
